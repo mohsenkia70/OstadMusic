@@ -1,9 +1,41 @@
 export type Role = "Teacher" | "Student" | string;
 
+
 export type LoginRequest = {
   emailOrPhone: string;
   password: string;
 };
+
+
+
+export type RegisterStudentRequest = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  password: string;
+  city: string;
+  district: string;
+  learningGoal: string;
+};
+
+
+
+export type RegisterTeacherRequest = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  password: string;
+  city: string;
+  district: string;
+  bio: string;
+  yearsOfExperience: number;
+  hourlyRate: number;
+  musicCategoryIds: number[];
+};
+
+
 
 export type AuthResponse = {
   userId: string;
@@ -14,27 +46,37 @@ export type AuthResponse = {
   expiresAtUtc: string;
 };
 
-/**
- * Generic shape for API errors. Adjust field names here if your friend's
- * error responses look different (e.g. { error: "..." } or ASP.NET's default
- * ProblemDetails shape with a "title"/"errors" object) — everything that
- * reads errors goes through getErrorMessage() below, so you only have to fix
- * it in one place.
- */
+
+
 export type ApiErrorBody = {
   message?: string;
   title?: string;
   errors?: Record<string, string[]>;
 };
 
-export class ApiError extends Error {
-  status: number;
-  body: unknown;
 
-  constructor(message: string, status: number, body?: unknown) {
+
+export class ApiError extends Error {
+
+  status:number;
+
+  body:unknown;
+
+
+  constructor(
+    message:string,
+    status:number,
+    body?:unknown
+  ){
+
     super(message);
-    this.name = "ApiError";
-    this.status = status;
-    this.body = body;
+
+    this.name="ApiError";
+
+    this.status=status;
+
+    this.body=body;
+
   }
+
 }

@@ -38,7 +38,7 @@ export default function LoginPage() {
 
   return (
     <AuthShell
-      title="خوش برگشتی"
+      title="خوش اومدی"
       subtitle="برای ادامه‌ی مسیرت وارد حساب کاربری‌ات شو."
       footer={
         <>
