@@ -7,4 +7,4 @@
 // API. Once your friend's API has a real domain + TLS certificate, update
 // this (or the env var) to an https:// URL.
 export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://185.19.201.55:3000/api/v1";
+  process.env.NEXT_PUBLIC_API_URL || "http://185.19.201.55:8082/api/v1";
