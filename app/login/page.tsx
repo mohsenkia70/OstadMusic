@@ -30,9 +30,9 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginForm) => {
     try {
       const user = await login(data.emailOrPhone, data.password);
-      router.push(user.role === "Teacher" ? "/dashboard/teacher" : "/dashboard/student");
+      router.push("/");
     } catch {
-      // error message is already set on the store and rendered below
+      
     }
   };
 

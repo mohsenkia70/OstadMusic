@@ -25,9 +25,6 @@ auth:false
 }
 
 
-
-
-
 export function registerStudentRequest(
 data:RegisterStudentRequest
 ){
@@ -42,10 +39,6 @@ auth:false
 );
 
 }
-
-
-
-
 
 export function registerTeacherRequest(
 data:RegisterTeacherRequest
