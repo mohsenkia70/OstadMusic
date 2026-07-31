@@ -48,6 +48,9 @@ const panelVariants = {
   },
 };
 
+console.log("test");
+
+
 const listVariants = {
   hidden: {},
   visible: {
