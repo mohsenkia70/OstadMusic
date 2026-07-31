@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { Menu, X, ShoppingBag, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/components/cart/cart-provider";
@@ -20,13 +20,19 @@ const links = [
   { href: "/about", label: "درباره ما" },
 ];
 
-const backdropVariants = {
+const backdropVariants: Variants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.3, ease: "easeOut" } },
-  exit: { opacity: 0, transition: { duration: 0.25, ease: "easeIn" } },
+  visible: {
+    opacity: 1,
+    transition: { duration: 0.3, ease: "easeOut" },
+  },
+  exit: {
+    opacity: 0,
+    transition: { duration: 0.25, ease: "easeIn" },
+  },
 };
 
-const panelVariants = {
+const panelVariants: Variants = {
   hidden: { x: "100%" },
   visible: {
     x: 0,
@@ -48,10 +54,7 @@ const panelVariants = {
   },
 };
 
-console.log("test");
-
-
-const listVariants = {
+const listVariants: Variants = {
   hidden: {},
   visible: {
     transition: {
@@ -61,7 +64,7 @@ const listVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, x: 24 },
   visible: {
     opacity: 1,
@@ -269,7 +272,7 @@ export function Navbar() {
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="fixed inset-y-0 right-0 z-[210] flex w-[min(86vw,340px)] flex-col bg-bg/98 shadow-[ -12px_0_40px_rgba(0,0,0,0.18)] border-l border-line/80 lg:hidden"
+              className="fixed inset-y-0 right-0 z-[210] flex w-[min(86vw,340px)] flex-col bg-bg/98 shadow-[-12px_0_40px_rgba(0,0,0,0.18)] border-l border-line/80 lg:hidden"
             >
               {/* Header */}
               <div className="relative flex items-center justify-between px-5 py-5 border-b border-line/70">
