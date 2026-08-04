@@ -46,16 +46,11 @@ export type AuthResponse = {
   expiresAtUtc: string;
 };
 
-
-
 export type ApiErrorBody = {
   message?: string;
   title?: string;
   errors?: Record<string, string[]>;
 };
-
-
-
 
 
 export type TeacherListItem = {
@@ -88,10 +83,51 @@ export type TeachersListResponse = {
 };
 
 
+export type CreateBookingRequest = {
+  teacherProfileId: string;
+  musicCategoryId?: number | null;
+  sessionStartUtc: string; // ISO
+  durationMinutes: number;
+  studentNote?: string | null;
+};
 
+export type BookingActionRequest = {
+  note?: string | null;
+};
 
+export type CreatePaymentRequest = {
+  bookingId: string;
+};
 
+/** پاسخ ساخت رزرو — بک‌اند ممکنه فقط id برگردونه یا آبجکت کامل */
+export type CreateBookingResponse = {
+  id?: string;
+  bookingId?: string;
+  [key: string]: unknown;
+};
 
+export type PaymentRequestResponse = {
+  paymentUrl?: string;
+  authority?: string;
+  url?: string;
+  [key: string]: unknown;
+};
+
+export type MusicCategory = {
+  id: number;
+  name: string;
+};
+
+export type BookingItem = {
+  id: string;
+  teacherProfileId?: string;
+  teacherName?: string;
+  sessionStartUtc?: string;
+  durationMinutes?: number;
+  status?: string;
+  studentNote?: string;
+  [key: string]: unknown;
+};
 
 export class ApiError extends Error {
 

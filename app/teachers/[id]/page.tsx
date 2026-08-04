@@ -2,17 +2,10 @@ import { notFound } from "next/navigation";
 import { Star, MapPin, Clock, ShieldCheck, Video } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { BookingForm } from "@/components/booking/booking-form";
 import { getTeacherById } from "@/lib/api/teachers";
 import { ApiError } from "@/lib/api/types";
-
-const availableSlots = [
-  "شنبه ۱۸:۰۰",
-  "یکشنبه ۱۷:۳۰",
-  "سه‌شنبه ۱۹:۰۰",
-  "پنجشنبه ۱۶:۰۰",
-];
 
 function getInitials(fullName: string) {
   return fullName
@@ -117,6 +110,7 @@ export default async function TeacherProfilePage({
 
       <section className="px-6 md:px-8 pb-28">
         <div className="mx-auto max-w-[1200px] grid lg:grid-cols-[1fr_360px] gap-10">
+          {/* Main */}
           <div className="space-y-12">
             <div>
               <h2 className="text-xl font-bold mb-4">درباره {firstName}</h2>
@@ -157,6 +151,7 @@ export default async function TeacherProfilePage({
             </div>
           </div>
 
+          {/* Sidebar — رزرو + پرداخت */}
           <div className="lg:sticky lg:top-28 h-fit">
             <div className="rounded-[20px] border border-line bg-surface p-7">
               <div className="flex items-baseline justify-between mb-6">
@@ -167,25 +162,11 @@ export default async function TeacherProfilePage({
                 </span>
               </div>
 
-              <p className="text-sm text-muted mb-3">زمان‌های آزاد این هفته</p>
-              <div className="grid grid-cols-2 gap-2.5 mb-7">
-                {availableSlots.map((slot) => (
-                  <button
-                    key={slot}
-                    type="button"
-                    className="rounded-xl border border-line bg-surface-2 px-3 py-2.5 text-xs text-ink/90 transition-colors hover:border-gold/40 hover:text-gold"
-                  >
-                    {slot}
-                  </button>
-                ))}
-              </div>
-
-              <Button className="w-full mb-3" size="lg">
-                رزرو کلاس 
-              </Button>
-              <Button variant="glass" className="w-full">
-                ارسال پیام به استاد
-              </Button>
+              <BookingForm
+                teacherProfileId={teacher.teacherProfileId}
+                teacherCategories={teacher.categories ?? []}
+                hourlyRate={teacher.hourlyRate}
+              />
             </div>
           </div>
         </div>
