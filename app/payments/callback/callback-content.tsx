@@ -66,7 +66,7 @@ export function PaymentCallbackContent() {
   }, [authority, status, token]);
 
 
-  console.log("test");
+  console.log("test1");
   
 
   return (
