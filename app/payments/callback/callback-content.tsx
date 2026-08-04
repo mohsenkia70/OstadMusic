@@ -65,6 +65,10 @@ export function PaymentCallbackContent() {
     verify();
   }, [authority, status, token]);
 
+
+  console.log("test");
+  
+
   return (
     <div className="max-w-md w-full rounded-2xl border border-line bg-surface p-8 text-center">
       {state === "loading" && (
