@@ -56,6 +56,43 @@ export type ApiErrorBody = {
 
 
 
+
+
+export type TeacherListItem = {
+  teacherProfileId: string;
+  userId: string;
+  fullName: string;
+  city: string;
+  district: string | null;
+  yearsOfExperience: number;
+  hourlyRate: number;
+  ratingAverage: number;
+  ratingCount: number;
+  isVerified: boolean;
+  bioShort: string;
+  categories: string[];
+};
+
+export type TeacherDetail = TeacherListItem & {
+  bio: string;
+  phoneNumber?: string;
+  email?: string;
+};
+
+export type TeachersListResponse = {
+  items: TeacherListItem[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+};
+
+
+
+
+
+
+
 export class ApiError extends Error {
 
   status:number;

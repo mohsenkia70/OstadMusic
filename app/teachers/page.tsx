@@ -1,51 +1,117 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Search, SlidersHorizontal, Loader2 } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { PageHeader } from "@/components/page-header";
 import { TeacherCard } from "@/components/teacher-card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { teachers } from "@/lib/data";
+import { getTeachers } from "@/lib/api/teachers";
+import type { TeacherListItem } from "@/lib/api/types";
 
-const cities = ["همه شهرها", "تهران", "اصفهان", "شیراز", "تبریز", "آنلاین"];
+const cities = ["همه شهرها", "تهران", "اصفهان", "شیراز", "تبریز"];
 const sortOptions = [
-  { value: "rating", label: "بیشترین امتیاز" },
-  { value: "price-asc", label: "ارزان‌ترین" },
-  { value: "price-desc", label: "گران‌ترین" },
-  { value: "experience", label: "بیشترین سابقه" },
+  { value: "0", label: "بیشترین امتیاز" },
+  { value: "1", label: "ارزان‌ترین" },
+  { value: "2", label: "گران‌ترین" },
+  { value: "3", label: "بیشترین سابقه" },
 ];
+
+function getInitials(fullName: string) {
+  return fullName
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0])
+    .join("");
+}
+
+function getGradient(id: string) {
+  const gradients = [
+    "linear-gradient(135deg, #f6d365 0%, #fda085 100%)",
+    "linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)",
+    "linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%)",
+    "linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)",
+    "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
+  ];
+  const index =
+    id.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0) %
+    gradients.length;
+  return gradients[index];
+}
+
+/** تبدیل دیتای API به شکل مورد انتظار TeacherCard */
+function toCardTeacher(t: TeacherListItem) {
+  return {
+    id: t.teacherProfileId,
+    name: t.fullName,
+    city: t.city,
+    years: t.yearsOfExperience,
+    rating: t.ratingAverage,
+    reviews: t.ratingCount,
+    price: Math.round(t.hourlyRate / 1000), // برای نمایش «هزار تومان»
+    specialty: t.categories?.[0] ?? "",
+    tags: t.categories ?? [],
+    bio: t.bioShort,
+    online: false,
+    initials: getInitials(t.fullName),
+    gradient: getGradient(t.teacherProfileId),
+  };
+}
 
 export default function TeachersPage() {
   const [query, setQuery] = useState("");
   const [city, setCity] = useState("همه شهرها");
-  const [onlineOnly, setOnlineOnly] = useState(false);
-  const [sort, setSort] = useState("rating");
+  const [onlyVerified, setOnlyVerified] = useState(false);
+  const [sort, setSort] = useState("0");
 
-  const filtered = useMemo(() => {
-    let list = teachers.filter((t) => {
-      const matchesQuery =
-        query.trim().length === 0 ||
-        t.name.includes(query) ||
-        t.specialty.includes(query) ||
-        t.tags.some((tag) => tag.includes(query));
-      const matchesCity = city === "همه شهرها" || t.city === city;
-      const matchesOnline = !onlineOnly || t.online;
-      return matchesQuery && matchesCity && matchesOnline;
-    });
+  const [teachers, setTeachers] = useState<TeacherListItem[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-    list = [...list].sort((a, b) => {
-      if (sort === "rating") return b.rating - a.rating;
-      if (sort === "price-asc") return a.price - b.price;
-      if (sort === "price-desc") return b.price - a.price;
-      if (sort === "experience") return b.years - a.years;
-      return 0;
-    });
+  useEffect(() => {
+    let cancelled = false;
 
-    return list;
-  }, [query, city, onlineOnly, sort]);
+    async function load() {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const res = await getTeachers({
+          search: query.trim() || undefined,
+          city: city === "همه شهرها" ? undefined : city,
+          onlyVerified: onlyVerified || undefined,
+          sortBy: Number(sort),
+          page: 1,
+          pageSize: 50,
+        });
+
+        if (!cancelled) {
+          setTeachers(res.items);
+          setTotalCount(res.totalCount);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(
+            err instanceof Error ? err.message : "خطا در دریافت لیست استادها"
+          );
+          setTeachers([]);
+          setTotalCount(0);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    const timer = setTimeout(load, 300); // debounce جست‌وجو
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [query, city, onlyVerified, sort]);
 
   return (
     <>
@@ -53,7 +119,7 @@ export default function TeachersPage() {
       <PageHeader
         eyebrow="فهرست اساتید"
         title="استادی که با تو هم‌سو باشد را پیدا کن"
-        desc="بیش از ۴۸۰ استاد تاییدشده، از سبک کلاسیک تا فیوژن ایرانی، آماده‌ی همراهی تو در مسیر یادگیری."
+        desc="استادان تاییدشده، از سبک کلاسیک تا فیوژن ایرانی، آماده‌ی همراهی تو در مسیر یادگیری."
       />
 
       <section className="px-6 md:px-8 pb-28">
@@ -96,31 +162,46 @@ export default function TeachersPage() {
               </select>
 
               <Button
-                variant={onlineOnly ? "gold" : "outline"}
+                variant={onlyVerified ? "gold" : "outline"}
                 size="default"
-                onClick={() => setOnlineOnly((v) => !v)}
+                onClick={() => setOnlyVerified((v) => !v)}
                 className="gap-2"
               >
                 <SlidersHorizontal className="h-4 w-4" />
-                فقط آنلاین
+                فقط تاییدشده
               </Button>
             </div>
           </div>
 
-          <p className="text-muted text-sm mb-6">
-            {filtered.length.toLocaleString("fa-IR")} استاد پیدا شد
-          </p>
-
-          {filtered.length > 0 ? (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filtered.map((t) => (
-                <TeacherCard key={t.id} teacher={t} />
-              ))}
+          {loading ? (
+            <div className="flex items-center justify-center py-24 gap-2 text-muted">
+              <Loader2 className="h-5 w-5 animate-spin" />
+              در حال بارگذاری...
+            </div>
+          ) : error ? (
+            <div className="text-center py-24 border border-dashed border-line rounded-[20px]">
+              <p className="text-red-400">{error}</p>
             </div>
           ) : (
-            <div className="text-center py-24 border border-dashed border-line rounded-[20px]">
-              <p className="text-muted">استادی با این فیلترها پیدا نشد. کمی معیارها را تغییر بده.</p>
-            </div>
+            <>
+              <p className="text-muted text-sm mb-6">
+                {totalCount.toLocaleString("fa-IR")} استاد پیدا شد
+              </p>
+
+              {teachers.length > 0 ? (
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {teachers.map((t) => (
+                    <TeacherCard key={t.teacherProfileId} teacher={toCardTeacher(t)} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-24 border border-dashed border-line rounded-[20px]">
+                  <p className="text-muted">
+                    استادی با این فیلترها پیدا نشد. کمی معیارها را تغییر بده.
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>
