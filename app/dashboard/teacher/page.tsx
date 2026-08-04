@@ -25,7 +25,7 @@ export default function TeacherOverviewPage() {
       return;
     }
 
-    // نقش رو case-insensitive چک کن (بسته به API ممکنه Teacher یا teacher باشه)
+
     const role = String(user.role).toLowerCase();
     if (role !== "teacher") {
       if (role === "student") {
@@ -36,7 +36,7 @@ export default function TeacherOverviewPage() {
     }
   }, [user, hasHydrated, isTokenExpired, logout, router]);
 
-  // تا hydrate و چک نقش تموم نشده، loading نشون بده
+
   if (!hasHydrated || !user) {
     return (
       <div className="flex items-center justify-center min-h-[40vh] text-muted text-sm">
@@ -47,7 +47,7 @@ export default function TeacherOverviewPage() {
 
   const role = String(user.role).toLowerCase();
   if (role !== "teacher") {
-    return null; // redirect در useEffect انجام می‌شه
+    return null; 
   }
 
   const displayName = [user.firstName, user.lastName].filter(Boolean).join(" ") || "استاد";

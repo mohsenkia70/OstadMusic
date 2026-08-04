@@ -155,7 +155,7 @@ export const useAuthStore = create<AuthState>()(
           return user;
         } catch (err) {
           const message =
-            err instanceof ApiError ? err.message : "ثبت‌نام شاگرد ناموفق بود.";
+            err instanceof ApiError ? err.message : "ثبت‌نام هنرجو ناموفق بود.";
 
           set({
             isLoading: false,

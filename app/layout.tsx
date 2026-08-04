@@ -17,7 +17,7 @@ import { CartDrawer } from "@/components/cart/cart-drawer";
 export const metadata: Metadata = {
   title: "استاد موزیک | همراه شما در مسیر ویولن",
   description:
-    "استاد موزیک شاگردهای مشتاق ویولن را به بهترین اساتید ایران وصل می‌کند؛ آنلاین یا حضوری، از اولین جلسه تا اجرای صحنه‌ای.",
+    "استاد موزیک هنرجو مشتاق ویولن را به بهترین اساتید ایران وصل می‌کند؛ آنلاین یا حضوری، از اولین جلسه تا اجرای صحنه‌ای.",
 };
 
 export default function RootLayout({

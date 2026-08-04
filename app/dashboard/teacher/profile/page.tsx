@@ -11,10 +11,24 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useProfileStore } from "@/lib/store/profile-store";
+import { useAuthStore } from "@/lib/store/auth-store";
 
 export default function TeacherProfilePage() {
-  const { avatarPreview, setAvatarPreview, clearAvatar } = useProfileStore();
+  const user = useAuthStore((s) => s.user);
+  const setAvatar = useProfileStore((s) => s.setAvatar);
+  const clearAvatar = useProfileStore((s) => s.clearAvatar);
+
+  const userId = user?.userId ?? "";
+
+  // سلکت مستقیم داده → ری‌رندر درست کار می‌کنه
+  const avatarPreview = useProfileStore((s) =>
+    userId ? s.avatars[userId] ?? null : null
+  );
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const displayName =
+    [user?.firstName, user?.lastName].filter(Boolean).join(" ") || "استاد";
 
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
@@ -22,7 +36,7 @@ export default function TeacherProfilePage() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
-    if (!selected) return;
+    if (!selected || !userId) return;
 
     if (!selected.type.startsWith("image/")) {
       alert("لطفاً فقط فایل تصویری انتخاب کنید.");
@@ -36,20 +50,27 @@ export default function TeacherProfilePage() {
 
     const reader = new FileReader();
     reader.onload = () => {
-      const base64 = reader.result as string;
-      setAvatarPreview(base64);
+      const result = reader.result as string;
+      setAvatar(userId, result);
+    };
+    reader.onerror = () => {
+      alert("خطا در خواندن فایل. لطفاً دوباره تلاش کنید.");
     };
     reader.readAsDataURL(selected);
+
+    // ریست اینپوت تا بتونی همون فایل رو دوباره انتخاب کنی
+    e.target.value = "";
   };
 
   const handleSave = () => {
-    // اینجا بعداً فایل رو به سرور آپلود کن
+    // بعداً آپلود واقعی به سرور
     console.log("avatar base64 length:", avatarPreview?.length);
     alert("تغییرات با موفقیت ذخیره شد");
   };
 
   const handleRemoveAvatar = () => {
-    clearAvatar();
+    if (!userId) return;
+    clearAvatar(userId);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -108,11 +129,12 @@ export default function TeacherProfilePage() {
           </div>
 
           <div>
-            <div className="font-bold text-lg">نگار احمدی</div>
-            <div className="text-muted text-sm mt-1">استاد از ۱۴۰۱</div>
+            <div className="font-bold text-lg">{displayName}</div>
+            <div className="text-muted text-sm mt-1">استاد</div>
 
             <div className="flex items-center gap-3 mt-3">
               <button
+                type="button"
                 onClick={handleAvatarClick}
                 className="flex items-center gap-1.5 text-xs text-gold hover:underline"
               >
@@ -122,6 +144,7 @@ export default function TeacherProfilePage() {
 
               {avatarPreview && (
                 <button
+                  type="button"
                   onClick={handleRemoveAvatar}
                   className="text-xs text-red-400 hover:underline"
                 >
@@ -136,7 +159,7 @@ export default function TeacherProfilePage() {
           <div className="grid sm:grid-cols-2 gap-5">
             <div>
               <Label>نام و نام‌خانوادگی</Label>
-              <Input defaultValue="نگار احمدی" />
+              <Input defaultValue={displayName} />
             </div>
 
             <div>
