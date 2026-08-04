@@ -63,12 +63,30 @@ const itemVariants: Variants = {
   },
 };
 
+const ROLE_LABEL: Record<string, string> = {
+  student: "هنرجو",
+  teacher: "استاد",
+};
+
+const PANEL_LABEL: Record<string, string> = {
+  student: "پنل هنرجو",
+  teacher: "پنل استاد",
+};
+
 export function DashboardMobileNav({ items }: { items: NavItem[] }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const logout = useAuthStore((s) => s.logout);
   const user = useAuthStore((s) => s.user);
+
+  const roleKey = String(user?.role ?? "").toLowerCase();
+  const displayName =
+    [user?.firstName, user?.lastName].filter(Boolean).join(" ") || "کاربر";
+  const displayRole = ROLE_LABEL[roleKey] || "کاربر";
+  const panelLabel = PANEL_LABEL[roleKey] || "پنل کاربری";
+  const initials =
+    [user?.firstName?.[0], user?.lastName?.[0]].filter(Boolean).join("") || "ک";
 
   // جلوگیری از اسکرول صفحه وقتی منو باز است
   useEffect(() => {
@@ -82,11 +100,18 @@ export function DashboardMobileNav({ items }: { items: NavItem[] }) {
     };
   }, [open]);
 
+  const handleLogout = () => {
+    logout();
+    setOpen(false);
+    router.replace("/login");
+  };
+
   return (
     <>
       {/* هدر موبایل */}
       <div className="lg:hidden sticky top-0 z-50 flex items-center justify-between border-b border-line bg-bg/90 backdrop-blur-xl px-5 py-4">
-         <button
+        <button
+          type="button"
           onClick={() => setOpen(true)}
           className="flex h-10 w-10 items-center justify-center rounded-xl text-ink hover:bg-ink/5 transition-colors"
           aria-label="باز کردن منو"
@@ -100,8 +125,6 @@ export function DashboardMobileNav({ items }: { items: NavItem[] }) {
           <LogoMark className="h-7 w-7 rounded-[8px]" />
           استاد موزیک
         </Link>
-
-     
       </div>
 
       {/* منوی موبایل */}
@@ -136,13 +159,12 @@ export function DashboardMobileNav({ items }: { items: NavItem[] }) {
                     <div className="font-display text-[1.05rem] font-extrabold leading-none">
                       استاد موزیک
                     </div>
-                    <div className="mt-1 text-[11px] text-muted">
-                      پنل استاد
-                    </div>
+                    <div className="mt-1 text-[11px] text-muted">{panelLabel}</div>
                   </div>
                 </div>
 
                 <button
+                  type="button"
                   onClick={() => setOpen(false)}
                   className="flex h-9 w-9 items-center justify-center rounded-full bg-ink/5 text-ink/70 transition-all hover:bg-ink/10 hover:text-ink active:scale-95"
                   aria-label="بستن منو"
@@ -160,7 +182,12 @@ export function DashboardMobileNav({ items }: { items: NavItem[] }) {
               >
                 <ul className="space-y-1">
                   {items.map((item) => {
-                    const active = pathname === item.href;
+                    const active =
+                      pathname === item.href ||
+                      (item.href !== "/dashboard/student" &&
+                        item.href !== "/dashboard/teacher" &&
+                        pathname.startsWith(item.href));
+
                     return (
                       <motion.li key={item.href} variants={itemVariants}>
                         <Link
@@ -176,7 +203,9 @@ export function DashboardMobileNav({ items }: { items: NavItem[] }) {
                           <item.icon
                             className={cn(
                               "h-5 w-5 shrink-0",
-                              active ? "text-gold" : "text-ink/60 group-hover:text-ink"
+                              active
+                                ? "text-gold"
+                                : "text-ink/60 group-hover:text-ink"
                             )}
                           />
                           <span className="flex-1">{item.label}</span>
@@ -201,17 +230,21 @@ export function DashboardMobileNav({ items }: { items: NavItem[] }) {
                   <div className="rounded-2xl border border-line/80 bg-bg px-4 py-3.5">
                     <div className="flex items-center gap-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gold/15 text-gold">
-                        <span className="text-sm font-bold">
-                          {user.firstName?.[0]}
-                          {user.lastName?.[0]}
-                        </span>
+                        <span className="text-sm font-bold">{initials}</span>
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="truncate text-sm font-bold">
-                          {user.firstName} {user.lastName}
+                          {displayName}
                         </div>
-                        <div className="mt-1 inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-medium bg-amber-500/15 text-amber-400">
-                          استاد
+                        <div
+                          className={cn(
+                            "mt-1 inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-medium",
+                            roleKey === "teacher"
+                              ? "bg-amber-500/15 text-amber-400"
+                              : "bg-sky-500/15 text-sky-400"
+                          )}
+                        >
+                          {displayRole}
                         </div>
                       </div>
                     </div>
@@ -219,12 +252,9 @@ export function DashboardMobileNav({ items }: { items: NavItem[] }) {
                 )}
 
                 <button
+                  type="button"
                   className="w-full flex items-center justify-center gap-2.5 rounded-2xl border border-red-500/25 py-3.5 text-[0.95rem] font-medium text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300"
-                  onClick={() => {
-                    logout();
-                    setOpen(false);
-                    router.push("/");
-                  }}
+                  onClick={handleLogout}
                 >
                   <LogOut className="h-4.5 w-4.5" />
                   خروج از حساب

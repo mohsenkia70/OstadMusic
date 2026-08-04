@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   User,
@@ -27,16 +29,63 @@ const items: NavItem[] = [
   { href: "/dashboard/student/settings", label: "تنظیمات", icon: Settings },
 ];
 
-export default function StudentDashboardLayout({ children }: { children: React.ReactNode }) {
+export default function StudentDashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const hasHydrated = useAuthStore((s) => s.hasHydrated);
+  const isTokenExpired = useAuthStore((s) => s.isTokenExpired);
+  const logout = useAuthStore((s) => s.logout);
 
-  const displayName = hasHydrated && user ? `${user.firstName} ${user.lastName}` : "مهسا رستمی";
-  const initials = hasHydrated && user ? `${user.firstName[0]}.${user.lastName[0]}` : "م.ر";
+  useEffect(() => {
+    if (!hasHydrated) return;
+
+    if (!user || isTokenExpired()) {
+      logout();
+      router.replace("/login");
+      return;
+    }
+
+    const role = String(user.role).toLowerCase();
+    if (role !== "student") {
+      if (role === "teacher") {
+        router.replace("/dashboard/teacher");
+      } else {
+        router.replace("/");
+      }
+    }
+  }, [user, hasHydrated, isTokenExpired, logout, router]);
+
+  // تا hydrate تموم نشده یا کاربر معتبر نیست، چیزی نشون نده
+  if (!hasHydrated || !user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen text-muted text-sm">
+        در حال بارگذاری...
+      </div>
+    );
+  }
+
+  const role = String(user.role).toLowerCase();
+  if (role !== "student") {
+    return null;
+  }
+
+  const displayName =
+    [user.firstName, user.lastName].filter(Boolean).join(" ") || "شاگرد";
+  const initials =
+    [user.firstName?.[0], user.lastName?.[0]].filter(Boolean).join(".") || "ش";
 
   return (
     <div className="flex">
-      <DashboardSidebar items={items} userName={displayName} userRole="شاگرد" userInitials={initials} />
+      <DashboardSidebar
+        items={items}
+        userName={displayName}
+        userRole="شاگرد"
+        userInitials={initials}
+      />
       <div className="flex-1 min-w-0">
         <DashboardMobileNav items={items} />
         <main className="p-6 md:p-9 max-w-[1100px]">{children}</main>

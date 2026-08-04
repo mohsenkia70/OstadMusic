@@ -1,16 +1,62 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { CalendarDays, ArrowLeft, Star } from "lucide-react";
 import { DashPageHeader, StatCard } from "@/components/dashboard/shared";
 import { Button } from "@/components/ui/button";
 import { teacherStudents, teacherReviews } from "@/lib/data";
+import { useAuthStore } from "@/lib/store/auth-store";
 
 export default function TeacherOverviewPage() {
+  const router = useRouter();
+  const user = useAuthStore((s) => s.user);
+  const hasHydrated = useAuthStore((s) => s.hasHydrated);
+  const isTokenExpired = useAuthStore((s) => s.isTokenExpired);
+  const logout = useAuthStore((s) => s.logout);
+
+  useEffect(() => {
+    if (!hasHydrated) return;
+
+    if (!user || isTokenExpired()) {
+      logout();
+      router.replace("/login");
+      return;
+    }
+
+    // نقش رو case-insensitive چک کن (بسته به API ممکنه Teacher یا teacher باشه)
+    const role = String(user.role).toLowerCase();
+    if (role !== "teacher") {
+      if (role === "student") {
+        router.replace("/dashboard/student");
+      } else {
+        router.replace("/");
+      }
+    }
+  }, [user, hasHydrated, isTokenExpired, logout, router]);
+
+  // تا hydrate و چک نقش تموم نشده، loading نشون بده
+  if (!hasHydrated || !user) {
+    return (
+      <div className="flex items-center justify-center min-h-[40vh] text-muted text-sm">
+        در حال بارگذاری...
+      </div>
+    );
+  }
+
+  const role = String(user.role).toLowerCase();
+  if (role !== "teacher") {
+    return null; // redirect در useEffect انجام می‌شه
+  }
+
+  const displayName = [user.firstName, user.lastName].filter(Boolean).join(" ") || "استاد";
   const nextUp = teacherStudents.slice(0, 3);
 
   return (
     <>
       <DashPageHeader
-        title="سلام نگار 👋"
+        title={`سلام ${displayName} 👋`}
         desc="این خلاصه‌ای از فعالیت تدریس تو در استاد موزیک است."
         action={
           <Button asChild variant="glass">
@@ -30,13 +76,19 @@ export default function TeacherOverviewPage() {
         <div className="rounded-2xl border border-line bg-surface p-6">
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-bold">کلاس‌های پیش‌رو</h2>
-            <Link href="/dashboard/teacher/schedule" className="text-xs text-gold hover:underline">
+            <Link
+              href="/dashboard/teacher/schedule"
+              className="text-xs text-gold hover:underline"
+            >
               مشاهده‌ی برنامه
             </Link>
           </div>
           <div className="space-y-3">
             {nextUp.map((s) => (
-              <div key={s.id} className="flex items-center justify-between rounded-xl bg-surface-2 px-4 py-3.5">
+              <div
+                key={s.id}
+                className="flex items-center justify-between rounded-xl bg-surface-2 px-4 py-3.5"
+              >
                 <div>
                   <div className="text-sm font-semibold">{s.name}</div>
                   <div className="text-xs text-muted mt-1">سطح {s.level}</div>
