@@ -15,6 +15,7 @@ const links = [
   { href: "/teachers", label: "اساتید" },
   { href: "/shop", label: "فروشگاه" },
   { href: "/#how", label: "چگونه کار می‌کند" },
+  { href: "/chatbot", label: "دستیار هوشمند" },
   { href: "/blog", label: "وبلاگ" },
   { href: "/faq", label: "سوالات متداول" },
   { href: "/about", label: "درباره ما" },
@@ -284,9 +285,7 @@ export function Navbar() {
                     <div className="font-display text-[1.05rem] font-extrabold leading-none">
                       استاد موزیک
                     </div>
-                    <div className="mt-1 text-[11px] text-muted">
-                      منوی اصلی
-                    </div>
+                    <div className="mt-1 text-[11px] text-muted">منوی اصلی</div>
                   </div>
                 </div>
 

@@ -48,7 +48,7 @@ function buildSessionUtc(dayOffset: number, hour: number, minute: number) {
 
 type Props = {
   teacherProfileId: string;
-  teacherCategories: string[]; // مثل ["گیتار","آواز"]
+  teacherCategories: string[]; 
   hourlyRate: number;
 };
 

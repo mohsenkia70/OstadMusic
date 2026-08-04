@@ -1,0 +1,57 @@
+// REFERENCE ONLY — this file is not wired into the app. It documents the
+// suggested schema for when you're ready to move chatbot persistence from
+// Zustand/localStorage (lib/chatbot/store.ts) to a real database.
+//
+// To actually use this: `npm install prisma @prisma/client`, rename this file
+// to schema.prisma, set DATABASE_URL in .env.local, then:
+//   npx prisma migrate dev --name init_chatbot
+//
+// The field names intentionally mirror lib/chatbot/types.ts so the swap is
+// mostly a matter of replacing the Zustand store's functions with Prisma
+// client calls — the rest of the chatbot (hooks, components, API route)
+// doesn't need to change shape.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // or "mysql" / "sqlite" — whatever you're already using
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(uuid())
+  // ... your existing user fields (see lib/store/auth-store.ts for the shape
+  //     already used by the real login integration)
+  conversations Conversation[]
+
+  @@map("users")
+}
+
+model Conversation {
+  id        String    @id @default(uuid())
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  title     String
+  mode      String    @default("general") // AssistantModeId: "general" | "learning" | "support"
+  messages  Message[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("conversations")
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           String // ChatRole: "user" | "assistant" | "system"
+  content        String       @db.Text
+  error          Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId])
+  @@map("messages")
+}
