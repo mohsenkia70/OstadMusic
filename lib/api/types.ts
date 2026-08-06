@@ -121,11 +121,19 @@ export type MusicCategory = {
 export type BookingItem = {
   id: string;
   teacherProfileId?: string;
-  teacherName?: string;
+  teacherFullName?: string;
+  studentProfileId?: string;
+  studentFullName?: string;
   sessionStartUtc?: string;
   durationMinutes?: number;
   status?: string;
-  studentNote?: string;
+  studentNote?: string | null;
+  teacherResponseNote?: string | null;
+  musicCategoryId?: number;
+  musicCategoryName?: string;
+  priceAmount?: number;
+  latestPaymentStatus?: string | null;
+  createdAtUtc?: string;
   [key: string]: unknown;
 };
 

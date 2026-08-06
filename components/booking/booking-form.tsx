@@ -2,16 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { Loader2, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   createBooking,
   extractBookingId,
-  extractPaymentUrl,
   getMusicCategories,
-  requestZarinpalPayment,
 } from "@/lib/api/bookings";
 import { ApiError } from "@/lib/api/types";
 import type { MusicCategory } from "@/lib/api/types";
@@ -48,7 +46,7 @@ function buildSessionUtc(dayOffset: number, hour: number, minute: number) {
 
 type Props = {
   teacherProfileId: string;
-  teacherCategories: string[]; 
+  teacherCategories: string[];
   hourlyRate: number;
 };
 
@@ -69,12 +67,12 @@ export function BookingForm({
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     getMusicCategories()
       .then((list) => {
         setCategories(list);
-        // پیش‌فرض: اولین دسته‌ای که استاد داره
         const match = list.find((c) => teacherCategories.includes(c.name));
         if (match) setMusicCategoryId(match.id);
         else if (list[0]) setMusicCategoryId(list[0].id);
@@ -85,7 +83,7 @@ export function BookingForm({
   const filteredCategories = useMemo(() => {
     if (!teacherCategories?.length) return categories;
     const matched = categories.filter((c) =>
-      teacherCategories.includes(c.name)
+      teacherCategories.includes(c.name),
     );
     return matched.length ? matched : categories;
   }, [categories, teacherCategories]);
@@ -94,6 +92,7 @@ export function BookingForm({
 
   const handleSubmit = async () => {
     setError(null);
+    setSuccess(false);
 
     if (!accessToken || isTokenExpired() || !user) {
       setError("برای رزرو باید وارد حساب کاربری‌ات شوی.");
@@ -120,39 +119,37 @@ export function BookingForm({
     setLoading(true);
 
     try {
-      // ۱) ساخت رزرو
+      // فقط ساخت رزرو (وضعیت Pending)
       const bookingRes = await createBooking({
         teacherProfileId,
         musicCategoryId: Number(musicCategoryId),
-        sessionStartUtc: buildSessionUtc(slot.dayOffset, slot.hour, slot.minute),
+        sessionStartUtc: buildSessionUtc(
+          slot.dayOffset,
+          slot.hour,
+          slot.minute,
+        ),
         durationMinutes: duration,
         studentNote: note.trim() || null,
       });
 
       const bookingId = extractBookingId(bookingRes);
+
       if (!bookingId) {
-        // اگر بک‌اند id برنگردوند، نمی‌تونیم پرداخت کنیم
         setError(
-          "رزرو ثبت شد ولی شناسه رزرو دریافت نشد. از بخش رزروهای من پیگیری کن."
+          "رزرو ثبت شد ولی شناسه رزرو دریافت نشد. از بخش رزروهای من پیگیری کن.",
         );
         setLoading(false);
         return;
       }
 
-      // ۲) درخواست پرداخت — بدون پرداخت رزرو کامل نمی‌شه
-      const payRes = await requestZarinpalPayment({ bookingId });
-      const paymentUrl = extractPaymentUrl(payRes);
+      // موفقیت — بدون پرداخت
+      setSuccess(true);
+      setLoading(false);
 
-      if (!paymentUrl) {
-        setError(
-          "رزرو ثبت شد ولی لینک پرداخت ساخته نشد. بعداً از بخش رزروها پرداخت کن."
-        );
-        setLoading(false);
-        return;
-      }
-
-      // ۳) ریدایرکت به درگاه
-      window.location.href = paymentUrl;
+      // بعد از ۲ ثانیه به صفحه رزروهای من هدایت شود
+      setTimeout(() => {
+        router.push("/dashboard/student/classes");
+      }, 2200);
     } catch (err) {
       const message =
         err instanceof ApiError
@@ -162,6 +159,23 @@ export function BookingForm({
       setLoading(false);
     }
   };
+
+  if (success) {
+    return (
+      <div className="space-y-4 text-center py-6">
+        <div className="flex justify-center">
+          <CheckCircle2 className="h-14 w-14 text-green-500" />
+        </div>
+        <h3 className="text-lg font-bold text-ink">درخواست رزرو ثبت شد</h3>
+        <p className="text-sm text-muted leading-6 px-2">
+          درخواستت برای استاد ارسال شد.
+          <br />
+          وضعیت را از بخش «کلاس‌های رزروشده» پیگیری کن.
+        </p>
+        <p className="text-xs text-muted">در حال انتقال به بخش رزروها...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">
@@ -212,7 +226,7 @@ export function BookingForm({
             value={musicCategoryId}
             onChange={(e) =>
               setMusicCategoryId(
-                e.target.value === "" ? "" : Number(e.target.value)
+                e.target.value === "" ? "" : Number(e.target.value),
               )
             }
             className="h-11 w-full rounded-xl border border-line bg-surface-2 px-3 text-sm"
@@ -228,7 +242,9 @@ export function BookingForm({
       )}
 
       <div>
-        <Label className="text-sm text-muted mb-2 block">یادداشت (اختیاری)</Label>
+        <Label className="text-sm text-muted mb-2 block">
+          یادداشت (اختیاری)
+        </Label>
         <Textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
@@ -260,16 +276,17 @@ export function BookingForm({
         {loading ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin ml-2" />
-            در حال انتقال به درگاه...
+            در حال ثبت درخواست...
           </>
         ) : (
-          "رزرو و پرداخت"
+          "ثبت درخواست رزرو"
         )}
       </Button>
 
       <p className="text-[11px] text-muted text-center leading-5">
-        پس از ثبت رزرو به درگاه زرین‌پال منتقل می‌شوی. تا قبل از پرداخت موفق،
-        رزرو قطعی نیست.
+        پس از ثبت درخواست، استاد باید آن را تأیید کند.
+        <br />
+        فقط بعد از تأیید استاد می‌توانی پرداخت را انجام دهی.
       </p>
     </div>
   );

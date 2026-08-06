@@ -61,7 +61,7 @@ export function getMusicCategories() {
   return apiRequest<MusicCategory[]>("/music-categories", { auth: false });
 }
 
-/** استخراج bookingId از پاسخ ساخت رزرو */
+
 export function extractBookingId(res: CreateBookingResponse): string | null {
   if (typeof res === "string") return res;
   if (res?.id && typeof res.id === "string") return res.id;
@@ -69,7 +69,6 @@ export function extractBookingId(res: CreateBookingResponse): string | null {
   return null;
 }
 
-/** استخراج لینک پرداخت */
 export function extractPaymentUrl(res: PaymentRequestResponse): string | null {
   if (res?.paymentUrl && typeof res.paymentUrl === "string") return res.paymentUrl;
   if (res?.url && typeof res.url === "string") return res.url;
