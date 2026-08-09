@@ -21,7 +21,6 @@ const items: NavItem[] = [
   { href: "/dashboard/student", label: "بخش کلی", icon: LayoutDashboard },
   { href: "/dashboard/student/profile", label: "پروفایل", icon: User },
   { href: "/dashboard/student/classes", label: "کلاس‌های رزروشده", icon: CalendarDays },
-  { href: "/dashboard/student/progress", label: "پیشرفت یادگیری", icon: TrendingUp },
   { href: "/dashboard/student/wishlist", label: "علاقه‌مندی‌ها", icon: Heart },
   { href: "/dashboard/student/messages", label: "پیام‌ها", icon: MessageCircle },
   { href: "/dashboard/student/payments", label: "پرداخت‌ها", icon: CreditCard },

@@ -1,65 +1,77 @@
-import { DashPageHeader, StatCard } from "@/components/dashboard/shared";
-import { Progress } from "@/components/ui/progress";
+import { StatCard } from "@/components/dashboard/shared";
+import { Badge } from "@/components/ui/badge";
 
-const skills = [
-  { label: "تکنیک کمان", value: 70 },
-  { label: "کوک و تشخیص گوش", value: 55 },
-  { label: "قطعات میانی", value: 40 },
-  { label: "خوانش نت", value: 82 },
-  { label: "ریتم و ضرب‌آهنگ", value: 60 },
+const classes = [
+  {
+    id: 1,
+    title: "آموزش ویولن مقدماتی",
+    teacher: "استاد محمد رضایی",
+    sessions: "جلسه ۸ از ۲۰",
+    nextSession: "شنبه - ۱۸:۰۰",
+    status: "در حال برگزاری",
+  },
+  {
+    id: 2,
+    title: "تکنیک آرشه‌کشی",
+    teacher: "استاد علی کریمی",
+    sessions: "جلسه ۳ از ۱۲",
+    nextSession: "دوشنبه - ۲۰:۰۰",
+    status: "در حال برگزاری",
+  },
+  {
+    id: 3,
+    title: "نت‌خوانی و سلفژ",
+    teacher: "استاد سارا احمدی",
+    sessions: "جلسه ۱۲ از ۱۶",
+    nextSession: "چهارشنبه - ۱۷:۳۰",
+    status: "در حال برگزاری",
+  },
 ];
 
-const milestones = [
-  { title: "اولین قطعه‌ی کامل", desc: "اجرای کامل «آهسته و آرام» ویوالدی", done: true },
-  { title: "تسلط بر گام سه اکتاو", desc: "نواختن روان گام دو ماژور در سه اکتاو", done: true },
-  { title: "اولین اجرای صحنه‌ای", desc: "اجرا در جشن پایان‌ترم آموزشگاه", done: false },
-  { title: "شروع کنسرتوی ویوالدی", desc: "آغاز کار روی موومان اول", done: false },
-];
-
-export default function StudentProgressPage() {
+export default function OngoingClassesPage() {
   return (
     <>
-      <DashPageHeader title="پیشرفت یادگیری" desc="نمای کلی از مهارت‌ها و نقاط عطف مسیر تو." />
-
       <div className="grid sm:grid-cols-3 gap-5 mb-9">
-        <StatCard label="ماه‌های تمرین پیوسته" value="۴ ماه" />
-        <StatCard label="قطعات تکمیل‌شده" value="۶ قطعه" />
-        <StatCard label="میانگین بازخورد استاد" value="۴.۸ از ۵" />
+        <StatCard label="کلاس‌های فعال" value="۳" />
+        <StatCard label="جلسات باقی‌مانده" value="۱۷" />
+        <StatCard label="میانگین پیشرفت" value="۷۲٪" />
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-6">
-        <div className="rounded-2xl border border-line bg-surface p-6">
-          <h2 className="font-bold mb-6">مهارت‌ها</h2>
-          <div className="space-y-5">
-            {skills.map((s) => (
-              <div key={s.label}>
-                <div className="flex justify-between text-sm mb-2">
-                  <span>{s.label}</span>
-                  <span className="text-muted">{s.value}٪</span>
-                </div>
-                <Progress value={s.value} />
-              </div>
-            ))}
-          </div>
-        </div>
+      <div className="rounded-2xl border border-line bg-surface p-6">
+        <h2 className="mb-6 text-lg font-bold">
+          کلاس‌های در حال برگزاری
+        </h2>
 
-        <div className="rounded-2xl border border-line bg-surface p-6">
-          <h2 className="font-bold mb-6">نقاط عطف</h2>
-          <div className="space-y-5">
-            {milestones.map((m) => (
-              <div key={m.title} className="flex gap-3">
-                <span
-                  className={`mt-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${
-                    m.done ? "bg-gold" : "border border-line"
-                  }`}
-                />
+        <div className="space-y-4">
+          {classes.map((item) => (
+            <div
+              key={item.id}
+              className="rounded-xl border border-line p-5 transition hover:border-gold"
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold">{item.title}</h3>
+
+                <Badge>{item.status}</Badge>
+              </div>
+
+              <div className="mt-4 grid gap-3 text-sm text-muted sm:grid-cols-3">
                 <div>
-                  <div className={`text-sm font-semibold ${m.done ? "" : "text-muted"}`}>{m.title}</div>
-                  <div className="text-xs text-muted mt-0.5">{m.desc}</div>
+                  <span className="font-medium text-foreground">استاد: </span>
+                  {item.teacher}
+                </div>
+
+                <div>
+                  <span className="font-medium text-foreground">وضعیت جلسات: </span>
+                  {item.sessions}
+                </div>
+
+                <div>
+                  <span className="font-medium text-foreground">جلسه بعدی: </span>
+                  {item.nextSession}
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
     </>
