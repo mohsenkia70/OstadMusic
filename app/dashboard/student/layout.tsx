@@ -58,7 +58,8 @@ export default function StudentDashboardLayout({
     }
   }, [user, hasHydrated, isTokenExpired, logout, router]);
 
-  // تا hydrate تموم نشده یا کاربر معتبر نیست، چیزی نشون نده
+ console.log(".");
+ 
   if (!hasHydrated || !user) {
     return (
       <div className="flex items-center justify-center min-h-screen text-muted text-sm">
