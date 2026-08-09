@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { HeroCanvas } from "@/components/three/hero-canvas";
+// import { HeroCanvas } from "@/components/three/hero-canvas";
 import { Button } from "@/components/ui/button";
 
 export function HeroSection() {
@@ -17,7 +17,7 @@ export function HeroSection() {
             "radial-gradient(500px 400px at 20% 65%, rgba(13,148,136,0.14), transparent 70%)",
         }}
       />
-      <HeroCanvas />
+      {/* <HeroCanvas /> */}
 
       <motion.div
         initial={{ opacity: 0, y: 24 }}
@@ -27,18 +27,15 @@ export function HeroSection() {
       >
         <span className="inline-flex items-center gap-2 text-sm text-gold bg-gold-soft border border-gold/30 px-4 py-1.5 rounded-full mb-7">
           <span className="h-1.5 w-1.5 rounded-full bg-gold" />
-          آموزش خصوصی ویولن، آنلاین و حضوری در سراسر ایران
+        مسیر حرفه‌ای تو از یک انتخاب درست شروع می‌شود
         </span>
 
-        <h1 className="text-[2.4rem] leading-[1.22] sm:text-6xl md:text-7xl mb-6">
-          صدای درونت را
-          <br />
-          <span className="text-gold">با استاد درست</span> پیدا کن
+        <h1 className="text-[2.4rem] leading-[1.22] sm:text-3xl md:text-4xl mb-6">
+         استاد موسیقی‌ات را هوشمندانه انتخاب کن
         </h1>
 
         <p className="text-base sm:text-lg text-muted max-w-xl mx-auto mb-10">
-          استاد موزیک هنرجوهای مشتاق ویولن را به بهترین اساتید ایران وصل می‌کند؛ از اولین باری که کمان
-          دست می‌گیری تا شبی که روی صحنه می‌نوازی.
+         از اولین تمرین تا اجرای روی صحنه، استاد مناسب خودت را پیدا کن و قدم‌به‌قدم پیشرفت کن.
         </p>
 
         <div className="flex flex-wrap gap-4 justify-center mb-10">
@@ -50,7 +47,6 @@ export function HeroSection() {
           </Button>
         </div>
 
-        <p className="text-sm text-muted/75">بدون نیاز به کارت اعتباری &middot; اولین جلسه رایگان</p>
       </motion.div>
 
       <motion.div
