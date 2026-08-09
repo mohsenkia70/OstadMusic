@@ -6,12 +6,18 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export function Counter({ target }: { target: number }) {
+interface CounterProps {
+  target: number;
+  className?: string;
+}
+
+export function Counter({ target, className }: CounterProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+
     const obj = { val: 0 };
 
     const trigger = ScrollTrigger.create({
@@ -30,8 +36,19 @@ export function Counter({ target }: { target: number }) {
       },
     });
 
-    return () => trigger.kill();
+    return () => {
+      trigger.kill();
+    };
   }, [target]);
 
-  return <div ref={ref} className="font-display text-3xl md:text-4xl font-extrabold text-gold">۰</div>;
+  return (
+    <div
+      ref={ref}
+      className={
+        className ??
+        "font-display text-3xl md:text-4xl font-extrabold text-gold"
+      }
+    >
+    </div>
+  );
 }

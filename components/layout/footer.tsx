@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AtSign, Send, PlayCircle } from "lucide-react";
+import { AtSign, Send, PlayCircle, Heart } from "lucide-react";
 import { LogoMark } from "@/components/logo-mark";
 
 const columns = [
@@ -33,37 +33,68 @@ const columns = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-line bg-bg-2 pt-20 pb-8">
-      <div className="mx-auto max-w-[1200px] px-6 md:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr_1fr] gap-10 mb-16">
-          <div>
-            <div className="flex items-center gap-2.5 font-display text-xl font-extrabold mb-4">
+    <footer className="relative overflow-hidden border-t border-line/60 bg-bg-2">
+      {/* Soft ambient glow */}
+      <div
+        className="pointer-events-none absolute -top-32 left-1/2 h-64 w-[600px] -translate-x-1/2 rounded-full opacity-40 blur-3xl"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, rgba(13,148,136,0.15), transparent 70%)",
+        }}
+      />
+
+      <div className="relative mx-auto max-w-[1200px] px-6 pt-20 pb-10 md:px-8">
+        {/* Top section */}
+        <div className="mb-16 grid grid-cols-2 gap-x-8 gap-y-12 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
+          {/* Brand */}
+          <div className="col-span-2 md:col-span-1">
+            <Link
+              href="/"
+              className="mb-5 inline-flex items-center gap-2.5 font-display text-xl font-extrabold tracking-tight text-ink transition-opacity hover:opacity-80"
+            >
               <LogoMark className="h-8 w-8" />
               استاد موزیک
-            </div>
-            <p className="text-muted text-sm max-w-[280px] mb-5">
-              پلتفرمی برای وصل‌شدن هنرجوان و اساتید ویولن در سراسر ایران؛ با اعتماد، شفافیت و عشق به موسیقی.
+            </Link>
+
+            <p className="mb-6 max-w-[280px] text-sm leading-7 text-muted">
+              پلتفرمی برای وصل‌شدن هنرجوان و اساتید ویولن در سراسر ایران؛ با اعتماد،
+              شفافیت و عشق به موسیقی.
             </p>
+
+            {/* Social */}
             <div className="flex gap-2.5">
-              {[AtSign, Send, PlayCircle].map((Icon, i) => (
+              {[
+                { Icon: AtSign, label: "اینستاگرام" },
+                { Icon: Send, label: "تلگرام" },
+                { Icon: PlayCircle, label: "یوتیوب" },
+              ].map(({ Icon, label }) => (
                 <a
-                  key={i}
+                  key={label}
                   href="#"
-                  className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-line text-muted transition-colors hover:text-gold hover:border-gold/40"
+                  aria-label={label}
+                  className="group flex h-10 w-10 items-center justify-center rounded-xl border border-line/70 bg-surface/60 text-muted transition-all duration-300 hover:-translate-y-0.5 hover:border-gold/40 hover:bg-gold-soft hover:text-gold hover:shadow-[0_8px_20px_-8px_rgba(13,148,136,0.35)]"
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" />
                 </a>
               ))}
             </div>
           </div>
+
+          {/* Columns */}
           {columns.map((col) => (
             <div key={col.title}>
-              <h5 className="text-sm font-semibold text-muted mb-5 tracking-wide">{col.title}</h5>
+              <h5 className="mb-5 text-xs font-semibold tracking-widest text-muted uppercase">
+                {col.title}
+              </h5>
               <ul className="flex flex-col gap-3.5">
                 {col.links.map((l) => (
                   <li key={l.label}>
-                    <Link href={l.href} className="text-sm text-ink/85 hover:text-gold transition-colors">
+                    <Link
+                      href={l.href}
+                      className="group relative inline-block text-sm text-ink/80 transition-colors duration-300 hover:text-gold"
+                    >
                       {l.label}
+                      <span className="absolute -bottom-0.5 right-0 h-px w-0 bg-gold transition-all duration-300 group-hover:w-full" />
                     </Link>
                   </li>
                 ))}
@@ -71,9 +102,18 @@ export function Footer() {
             </div>
           ))}
         </div>
-        <div className="flex flex-wrap justify-between items-center gap-3 pt-7 border-t border-line text-muted text-sm">
-          <span>© ۱۴۰۴ استاد موزیک. تمامی حقوق محفوظ است.</span>
-          <span>ساخته‌شده با ❤ برای موسیقی ایران</span>
+
+        {/* Bottom bar */}
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-line/50 pt-8 sm:flex-row">
+          <p className="text-sm text-muted">
+            © ۱۴۰۴ استاد موزیک. تمامی حقوق محفوظ است.
+          </p>
+
+          <p className="flex items-center gap-1.5 text-sm text-muted">
+            ساخته‌شده با
+            <Heart className="h-3.5 w-3.5 fill-gold text-gold" />
+            برای موسیقی ایران
+          </p>
         </div>
       </div>
     </footer>
