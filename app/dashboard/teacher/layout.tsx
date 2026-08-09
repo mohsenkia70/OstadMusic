@@ -24,7 +24,7 @@ const items: NavItem[] = [
   { href: "/dashboard/teacher/videos", label: "ویدیوها", icon: Video },
   { href: "/dashboard/teacher/schedule", label: "برنامه‌ی تدریس", icon: CalendarDays },
   { href: "/dashboard/teacher/bookings", label: "درخواست‌های رزرو", icon: CalendarDays }, // ← جدید
-  { href: "/dashboard/teacher/students", label: "شاگردان", icon: Users },
+  { href: "/dashboard/teacher/students", label: "هنرجوان", icon: Users },
   { href: "/dashboard/teacher/income", label: "درآمد", icon: Wallet },
   { href: "/dashboard/teacher/reviews", label: "نظرات", icon: Star },
   { href: "/dashboard/teacher/settings", label: "تنظیمات", icon: Settings },

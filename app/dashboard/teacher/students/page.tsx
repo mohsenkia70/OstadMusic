@@ -7,7 +7,7 @@ import { teacherStudents } from "@/lib/data";
 export default function TeacherStudentsPage() {
   return (
     <>
-      <DashPageHeader title="شاگردان" desc="فهرست شاگردان فعلی‌ات و وضعیت پیشرفت هرکدام." />
+      <DashPageHeader title="هنرجوان" desc="فهرست هنرجوان فعلی‌ات و وضعیت پیشرفت هرکدام." />
 
       <div className="rounded-2xl border border-line bg-surface overflow-hidden">
         <table className="w-full text-sm">

@@ -146,7 +146,7 @@ export default async function TeacherProfilePage({
             </div>
 
             <div>
-              <h2 className="text-xl font-bold mb-5">نظرات شاگردان</h2>
+              <h2 className="text-xl font-bold mb-5">نظرات هنرجوان</h2>
               <p className="text-muted text-sm">هنوز نظری ثبت نشده است.</p>
             </div>
           </div>

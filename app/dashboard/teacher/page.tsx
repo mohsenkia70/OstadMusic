@@ -66,7 +66,7 @@ export default function TeacherOverviewPage() {
       />
 
       <div className="grid sm:grid-cols-4 gap-5 mb-9">
-        <StatCard label="شاگردان فعال" value="۱۸" hint="۲ نفر جدید این ماه" />
+        <StatCard label="هنرجوان فعال" value="۱۸" hint="۲ نفر جدید این ماه" />
         <StatCard label="کلاس این هفته" value="۱۲ جلسه" />
         <StatCard label="درآمد این ماه" value="۶,۴۰۰,۰۰۰ تومان" />
         <StatCard label="امتیاز کلی" value="۴.۹ از ۵" />

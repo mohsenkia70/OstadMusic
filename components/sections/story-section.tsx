@@ -25,7 +25,7 @@ export function StorySection() {
             <div className="absolute bottom-7 inset-x-7 font-display text-lg font-semibold leading-relaxed text-ink">
               «معلمم فقط تکنیک یاد نداد؛ یاد داد چطور گوش کنم.»
               <small className="block mt-2.5 font-body font-normal text-sm text-muted">
-                مهسا، شاگرد استاد موزیک از سال ۱۴۰۱
+                مهسا، هنرجو استاد موزیک از سال ۱۴۰۱
               </small>
             </div>
           </div>
@@ -42,7 +42,7 @@ export function StorySection() {
             برای همین لحظه ساخته شده — مسیری شخصی، با استادی که سبک، سرعت و روحیه‌ی تو را می‌فهمد.
           </p>
           <p className="text-muted mb-7 leading-8">
-            ما اساتید را با بررسی سابقه‌ی تدریس، نمونه‌اجرا و بازخورد شاگردان واقعی تایید می‌کنیم،
+            ما اساتید را با بررسی سابقه‌ی تدریس، نمونه‌اجرا و بازخورد هنرجوان واقعی تایید می‌کنیم،
             تا انتخاب تو نه یک حدس، بلکه یک تصمیم مطمئن باشد.
           </p>
           <Button asChild variant="glass">

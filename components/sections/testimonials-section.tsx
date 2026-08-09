@@ -23,7 +23,7 @@ export function TestimonialsSection() {
     <section className="py-28 md:py-32">
       <div className="mx-auto max-w-[1200px] px-6 md:px-8">
         <Reveal className="max-w-xl mx-auto text-center mb-14">
-          <span className="block text-gold text-sm font-semibold mb-4 tracking-wide">تجربه‌ی شاگردان</span>
+          <span className="block text-gold text-sm font-semibold mb-4 tracking-wide">تجربه‌ی هنرجوان</span>
           <h2 className="text-3xl md:text-4xl">حرف‌هایی که پشت هر جلسه‌ی تمرین است</h2>
         </Reveal>
 

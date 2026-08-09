@@ -8,6 +8,7 @@ import { OtpInput } from "@/components/otp-input";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const RESEND_SECONDS = 60;
 
@@ -42,7 +43,6 @@ export default function PhoneLoginPage() {
   const [resendHint, setResendHint] = useState(false);
   const redirectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Resend countdown, only ticks while on the OTP step
   useEffect(() => {
     if (step !== "otp") return;
     if (countdown <= 0) return;
@@ -50,7 +50,6 @@ export default function PhoneLoginPage() {
     return () => clearInterval(id);
   }, [step, countdown]);
 
-  // Clean up any pending redirect if the component unmounts mid-flow
   useEffect(() => {
     return () => {
       if (redirectTimer.current) clearTimeout(redirectTimer.current);
@@ -100,34 +99,60 @@ export default function PhoneLoginPage() {
         title="ورود با شماره موبایل"
         subtitle="شماره موبایلت را وارد کن تا کد تایید برایت پیامک شود."
       >
-        <form onSubmit={handleSendCode} className="space-y-5" noValidate>
-          <div>
-            <Label htmlFor="phone">شماره موبایل</Label>
-            <div className="relative">
-              <Phone className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
-              <Input
-                id="phone"
-                type="tel"
-                inputMode="numeric"
-                dir="ltr"
-                placeholder="۰۹۱۲ ۳۴۵ ۶۷۸۹"
-                className="pr-11 text-left"
-                value={phone}
-                onChange={(e) => {
-                  setPhone(e.target.value);
-                  if (phoneError) setPhoneError("");
-                }}
-                aria-invalid={Boolean(phoneError)}
-              />
+        <form onSubmit={handleSendCode} className="space-y-6" noValidate>
+          <div className="space-y-2.5">
+            <Label htmlFor="phone" className="text-[#d4cfc4] text-[13.5px] font-medium">
+              شماره موبایل
+            </Label>
+            <div className="relative group">
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#d4a84b]/15 to-[#0d9488]/15 opacity-0 group-focus-within:opacity-100 blur-sm transition-opacity duration-500" />
+              <div className="relative">
+                <Phone className="absolute right-4 top-1/2 -translate-y-1/2 h-[18px] w-[18px] text-[#8a8278] group-focus-within:text-[#d4a84b] transition-colors duration-300" />
+                <Input
+                  id="phone"
+                  type="tel"
+                  inputMode="numeric"
+                  dir="ltr"
+                  placeholder="۰۹۱۲ ۳۴۵ ۶۷۸۹"
+                  className={cn(
+                    "h-14 pr-12 text-left text-[16px] rounded-2xl",
+                    "bg-[#16140f]/75 border-[#2c2822] text-[#f5f0e6]",
+                    "placeholder:text-[#5e574e]",
+                    "focus-visible:ring-2 focus-visible:ring-[#d4a84b]/35 focus-visible:border-[#d4a84b]/45",
+                    "transition-all duration-300"
+                  )}
+                  value={phone}
+                  onChange={(e) => {
+                    setPhone(e.target.value);
+                    if (phoneError) setPhoneError("");
+                  }}
+                  aria-invalid={Boolean(phoneError)}
+                />
+              </div>
             </div>
-            {phoneError && <p className="text-xs text-red-600 mt-1.5">{phoneError}</p>}
+            {phoneError && (
+              <p className="text-[13px] text-red-400/90 mt-1.5 flex items-center gap-1.5">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-400" />
+                {phoneError}
+              </p>
+            )}
           </div>
 
-          <Button type="submit" size="lg" className="w-full">
+          <Button
+            type="submit"
+            size="lg"
+            className={cn(
+              "w-full h-14 rounded-2xl text-[15.5px] font-semibold",
+              "bg-gradient-to-l from-[#d4a84b] via-[#e0b85c] to-[#d4a84b]",
+              "text-[#1a160f] hover:brightness-110",
+              "shadow-[0_10px_36px_rgba(212,168,75,0.28)]",
+              "transition-all duration-300 active:scale-[0.985]"
+            )}
+          >
             دریافت کد تایید
           </Button>
 
-          <p className="text-xs text-muted text-center leading-6">
+          <p className="text-[12.5px] text-[#6f685e] text-center leading-6 pt-1">
             با ادامه، شرایط استفاده و حریم خصوصی استاد موزیک را می‌پذیری.
           </p>
         </form>
@@ -143,42 +168,60 @@ export default function PhoneLoginPage() {
         <button
           type="button"
           onClick={handleEditPhone}
-          className="text-gold font-semibold hover:underline"
+          className="text-[#d4a84b] font-semibold hover:underline underline-offset-4 transition-all disabled:opacity-40"
           disabled={status !== "idle"}
         >
           ویرایش شماره موبایل
         </button>
       }
     >
-      <div className="space-y-6">
-        <OtpInput key={otpKey} length={5} disabled={status !== "idle"} onComplete={handleOtpComplete} />
+      <div className="space-y-8">
+        <OtpInput
+          key={otpKey}
+          length={5}
+          disabled={status !== "idle"}
+          onComplete={handleOtpComplete}
+        />
 
-        <div className="min-h-[52px]">
+        <div className="min-h-[56px] flex flex-col items-center justify-center">
           {status === "verifying" && (
-            <div className="flex items-center justify-center gap-2 text-sm text-muted">
-              <Loader2 className="h-4 w-4 animate-spin text-gold" />
+            <div className="flex items-center gap-2.5 text-[14px] text-[#a89f8f]">
+              <Loader2 className="h-4 w-4 animate-spin text-[#d4a84b]" />
               در حال بررسی کد...
             </div>
           )}
+
           {status === "success" && (
-            <div className="flex items-center justify-center gap-2 text-sm text-gold">
-              <CheckCircle2 className="h-4 w-4" />
+            <div className="flex items-center gap-2.5 text-[14px] text-[#d4a84b]">
+              <CheckCircle2 className="h-5 w-5" />
               کد تایید شد، در حال ورود به حساب...
             </div>
           )}
+
           {status === "idle" && (
-            <div className="flex items-center justify-center text-xs text-muted">
+            <div className="text-[13px] text-[#8a8278]">
               {countdown > 0 ? (
-                <span>ارسال دوباره‌ی کد تا {toPersianDigits(String(countdown))} ثانیه‌ی دیگر</span>
+                <span>
+                  ارسال دوباره‌ی کد تا{" "}
+                  <span className="text-[#d4a84b] font-medium tabular-nums">
+                    {toPersianDigits(String(countdown))}
+                  </span>{" "}
+                  ثانیه‌ی دیگر
+                </span>
               ) : (
-                <button type="button" onClick={handleResend} className="text-gold font-semibold hover:underline">
+                <button
+                  type="button"
+                  onClick={handleResend}
+                  className="text-[#d4a84b] font-semibold hover:underline underline-offset-4 transition-all"
+                >
                   ارسال دوباره‌ی کد
                 </button>
               )}
             </div>
           )}
+
           {resendHint && (
-            <p className="text-center text-xs text-gold mt-2">کد جدید ارسال شد</p>
+            <p className="text-[12.5px] text-[#14b8a6] mt-3">کد جدید ارسال شد</p>
           )}
         </div>
       </div>

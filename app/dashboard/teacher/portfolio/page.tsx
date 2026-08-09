@@ -14,7 +14,7 @@ export default function TeacherPortfolioPage() {
     <>
       <DashPageHeader
         title="نمونه‌کار"
-        desc="تصاویر و اجراهایی که به شاگردان بالقوه نشان داده می‌شود."
+        desc="تصاویر و اجراهایی که به هنرجوان بالقوه نشان داده می‌شود."
         action={
           <Button className="gap-2">
             <Plus className="h-4 w-4" /> افزودن نمونه‌کار

@@ -27,7 +27,7 @@ export default function StudentProfilePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const displayName =
-    [user?.firstName, user?.lastName].filter(Boolean).join(" ") || "شاگرد";
+    [user?.firstName, user?.lastName].filter(Boolean).join(" ") || "هنرجو";
 
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
@@ -126,7 +126,7 @@ export default function StudentProfilePage() {
 
           <div>
             <div className="font-bold text-lg">{displayName}</div>
-            <div className="text-muted text-sm mt-1">شاگرد</div>
+            <div className="text-muted text-sm mt-1">هنرجو</div>
 
             <div className="flex items-center gap-3 mt-3">
               <button

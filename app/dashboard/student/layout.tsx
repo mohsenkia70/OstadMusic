@@ -73,7 +73,7 @@ export default function StudentDashboardLayout({
   }
 
   const displayName =
-    [user.firstName, user.lastName].filter(Boolean).join(" ") || "شاگرد";
+    [user.firstName, user.lastName].filter(Boolean).join(" ") || "هنرجو";
   const initials =
     [user.firstName?.[0], user.lastName?.[0]].filter(Boolean).join(".") || "ش";
 
@@ -82,7 +82,7 @@ export default function StudentDashboardLayout({
       <DashboardSidebar
         items={items}
         userName={displayName}
-        userRole="شاگرد"
+        userRole="هنرجو"
         userInitials={initials}
       />
       <div className="flex-1 min-w-0">

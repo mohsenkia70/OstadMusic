@@ -5,7 +5,7 @@ import { teacherReviews } from "@/lib/data";
 export default function TeacherReviewsPage() {
   return (
     <>
-      <DashPageHeader title="نظرات" desc="بازخورد شاگردانت درباره‌ی کیفیت تدریس." />
+      <DashPageHeader title="نظرات" desc="بازخورد هنرجوانت درباره‌ی کیفیت تدریس." />
 
       <div className="grid sm:grid-cols-3 gap-5 mb-9">
         <StatCard label="امتیاز کلی" value="۴.۹ از ۵" />

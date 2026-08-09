@@ -10,7 +10,7 @@ export function TeachersSection() {
       <div className="mx-auto max-w-[1200px] px-6 md:px-8">
         <Reveal className="max-w-xl mb-14">
           <span className="block text-gold text-sm font-semibold mb-4 tracking-wide">اساتید برگزیده</span>
-          <h2 className="text-3xl md:text-4xl">با استادهایی که شاگردانشان دوستشان دارند آشنا شو</h2>
+          <h2 className="text-3xl md:text-4xl">با استادهایی که هنرجوانشان دوستشان دارند آشنا شو</h2>
         </Reveal>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">

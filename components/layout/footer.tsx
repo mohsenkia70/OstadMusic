@@ -13,7 +13,7 @@ const columns = [
     ],
   },
   {
-    title: "برای شاگردان",
+    title: "برای هنرجوان",
     links: [
       { href: "/teachers", label: "پیدا کردن استاد" },
       { href: "/shop", label: "فروشگاه استاد موزیک" },
@@ -42,7 +42,7 @@ export function Footer() {
               استاد موزیک
             </div>
             <p className="text-muted text-sm max-w-[280px] mb-5">
-              پلتفرمی برای وصل‌شدن شاگردان و اساتید ویولن در سراسر ایران؛ با اعتماد، شفافیت و عشق به موسیقی.
+              پلتفرمی برای وصل‌شدن هنرجوان و اساتید ویولن در سراسر ایران؛ با اعتماد، شفافیت و عشق به موسیقی.
             </p>
             <div className="flex gap-2.5">
               {[AtSign, Send, PlayCircle].map((Icon, i) => (

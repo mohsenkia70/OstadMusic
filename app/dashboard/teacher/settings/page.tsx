@@ -48,7 +48,7 @@ export default function TeacherSettingsPage() {
           <div className="space-y-4">
             {[
               { key: "newBookings" as const, label: "رزرو کلاس جدید" },
-              { key: "studentMessages" as const, label: "پیام‌های جدید از شاگردان" },
+              { key: "studentMessages" as const, label: "پیام‌های جدید از هنرجوان" },
               { key: "payoutAlerts" as const, label: "اعلان واریز درآمد" },
               { key: "marketing" as const, label: "اخبار و بروزرسانی‌های استاد موزیک" },
             ].map((item) => (

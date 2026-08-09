@@ -80,7 +80,7 @@ export default function TeacherProfilePage() {
     <>
       <DashPageHeader
         title="پروفایل من"
-        desc="این اطلاعات برای شاگردان روی صفحه‌ی عمومی‌ات نمایش داده می‌شود."
+        desc="این اطلاعات برای هنرجوان روی صفحه‌ی عمومی‌ات نمایش داده می‌شود."
       />
 
       <div className="rounded-2xl border border-line bg-surface p-7 max-w-2xl">

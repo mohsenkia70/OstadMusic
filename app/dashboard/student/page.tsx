@@ -50,7 +50,7 @@ export default function StudentOverviewPage() {
   }
 
   const displayName =
-    [user.firstName, user.lastName].filter(Boolean).join(" ") || "شاگرد";
+    [user.firstName, user.lastName].filter(Boolean).join(" ") || "هنرجو";
   const upcoming = studentClasses.filter((c) => c.status === "برنامه‌ریزی‌شده");
 
   return (
