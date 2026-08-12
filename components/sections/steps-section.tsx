@@ -56,10 +56,10 @@ export function StepsSection() {
           <span className="inline-block text-xs tracking-[0.25em] text-gold/80 mb-4">
             مسیر شروع
           </span>
-          <h2 className="text-3xl md:text-4xl lg:text-[2.75rem] font-medium mb-4 leading-tight">
+          <h2 className="text-3xl md:text-2xl lg:text-[2.1rem] font-medium mb-4 leading-tight">
             در سه قدم، اولین کلاست را رزرو کن
           </h2>
-          <p className="text-muted text-base md:text-lg max-w-md mx-auto">
+          <p className="text-muted text-base md:text-md max-w-md mx-auto">
             از جست‌وجو تا اولین نت، کمتر از یک روز طول می‌کشد.
           </p>
         </motion.div>

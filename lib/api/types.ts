@@ -99,7 +99,7 @@ export type CreatePaymentRequest = {
   bookingId: string;
 };
 
-/** پاسخ ساخت رزرو — بک‌اند ممکنه فقط id برگردونه یا آبجکت کامل */
+
 export type CreateBookingResponse = {
   id?: string;
   bookingId?: string;
@@ -134,6 +134,16 @@ export type BookingItem = {
   priceAmount?: number;
   latestPaymentStatus?: string | null;
   createdAtUtc?: string;
+  [key: string]: unknown;
+};
+
+
+export type TeacherOnboardingStatus = {
+  hasResume?: boolean;
+  resumeFileName?: string | null;
+  resumeUploadedAtUtc?: string | null;
+  approvalStatus?: string | null; 
+  rejectionReason?: string | null;
   [key: string]: unknown;
 };
 

@@ -24,7 +24,7 @@ export function TestimonialsSection() {
       <div className="mx-auto max-w-[1200px] px-6 md:px-8">
         <Reveal className="max-w-xl mx-auto text-center mb-14">
           <span className="block text-gold text-sm font-semibold mb-4 tracking-wide">تجربه‌ی هنرجوان</span>
-          <h2 className="text-3xl md:text-4xl">حرف‌هایی که پشت هر جلسه‌ی تمرین است</h2>
+          <h2 className="text-2xl md:text-2xl">حرف‌هایی که پشت هر جلسه‌ی تمرین است</h2>
         </Reveal>
 
         <Reveal>

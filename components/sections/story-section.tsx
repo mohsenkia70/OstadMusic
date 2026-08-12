@@ -33,7 +33,7 @@ export function StorySection() {
 
         <Reveal delay={0.1}>
           <span className="block text-gold text-sm font-semibold mb-4 tracking-wide">داستان استاد موزیک</span>
-          <h2 className="text-3xl md:text-4xl mb-5 leading-snug">
+          <h2 className="text-3xl md:text-2xl mb-5 leading-snug">
             یادگیری ویولن چیزی بیشتر از تمرین گام‌هاست
           </h2>
           <p className="text-muted mb-5 leading-8">

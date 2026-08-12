@@ -67,7 +67,7 @@ export function BenefitsSection() {
           <span className="inline-block text-xs tracking-[0.25em] text-gold/80 mb-4">
             چرا استاد موزیک
           </span>
-          <h2 className="text-3xl md:text-4xl lg:text-[2.75rem] font-medium leading-tight">
+          <h2 className="text-2xl md:text-2xl lg:text-[2.1rem] font-medium leading-tight">
             ساخته‌شده برای اعتماد
             <br className="hidden sm:block" />
             و پیشرفت واقعی

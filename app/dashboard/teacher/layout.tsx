@@ -20,10 +20,9 @@ const items: NavItem[] = [
   { href: "/dashboard/teacher", label: "بخش کلی", icon: LayoutDashboard },
   { href: "/dashboard/teacher/profile", label: "پروفایل", icon: User },
   { href: "/dashboard/teacher/portfolio", label: "نمونه‌کار", icon: ImageIcon },
-  { href: "/dashboard/teacher/resume", label: "رزومه", icon: FileText },
   { href: "/dashboard/teacher/videos", label: "ویدیوها", icon: Video },
   { href: "/dashboard/teacher/schedule", label: "برنامه‌ی تدریس", icon: CalendarDays },
-  { href: "/dashboard/teacher/bookings", label: "درخواست‌های رزرو", icon: CalendarDays }, // ← جدید
+  { href: "/dashboard/teacher/bookings", label: "درخواست‌های رزرو", icon: CalendarDays }, 
   { href: "/dashboard/teacher/students", label: "هنرجوان", icon: Users },
   { href: "/dashboard/teacher/income", label: "درآمد", icon: Wallet },
   { href: "/dashboard/teacher/reviews", label: "نظرات", icon: Star },

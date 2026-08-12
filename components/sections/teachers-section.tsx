@@ -12,7 +12,7 @@ export function TeachersSection() {
           <span className="mb-4 block text-sm font-semibold tracking-wide text-gold">
             اساتید برگزیده
           </span>
-          <h2 className="text-3xl md:text-4xl">
+          <h2 className="text-2xl md:text-2xl">
             با استادهایی که شاگردانشان دوستشان دارند آشنا شو
           </h2>
         </Reveal>

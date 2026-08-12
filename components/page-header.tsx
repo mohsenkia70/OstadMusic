@@ -20,7 +20,7 @@ export function PageHeader({
         <span className="inline-block text-gold text-sm font-semibold bg-gold-soft border border-gold/30 rounded-full px-4 py-1.5 mb-6">
           {eyebrow}
         </span>
-        <h1 className="text-3xl md:text-5xl mb-4">{title}</h1>
+        <h1 className="text-3xl md:text-2xl mb-4">{title}</h1>
         {desc && <p className="text-muted text-base md:text-lg">{desc}</p>}
       </div>
     </div>

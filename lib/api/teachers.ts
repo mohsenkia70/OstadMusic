@@ -47,3 +47,4 @@ export function getTeachers(params: GetTeachersParams = {}) {
 export function getTeacherById(id: string) {
   return apiRequest<TeacherDetail>(`/teachers/${id}`, { auth: false });
 }
+

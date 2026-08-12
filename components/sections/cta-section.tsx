@@ -16,14 +16,11 @@ export function CtaSection() {
             />
             <div className="relative">
               <h2 className="text-2xl md:text-4xl mb-4">اولین قدم را همین امروز بردار</h2>
-              <p className="text-muted mb-9 max-w-md mx-auto">
-                یک جلسه‌ی آزمایشی رایگان، بدون تعهد، برای شروع مسیر ویولن‌نوازی‌ات کافی است.
-              </p>
               <div className="flex flex-wrap gap-4 justify-center">
-                <Button asChild size="lg">
+                <Button className="mt-10" asChild size="lg">
                   <Link href="/teachers">پیدا کردن استاد مناسب</Link>
                 </Button>
-                <Button asChild variant="glass" size="lg">
+                <Button className="mt-10" asChild variant="glass" size="lg">
                   <Link href="/signup">عضویت به‌عنوان استاد</Link>
                 </Button>
               </div>
