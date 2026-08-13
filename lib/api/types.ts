@@ -1,12 +1,11 @@
-export type Role = "Teacher" | "Student" | string;
+// ─── Auth ────────────────────────────────────────────────────────────────────
 
+export type Role = "Teacher" | "Student" | "Admin" | string;
 
 export type LoginRequest = {
   emailOrPhone: string;
   password: string;
 };
-
-
 
 export type RegisterStudentRequest = {
   firstName: string;
@@ -18,8 +17,6 @@ export type RegisterStudentRequest = {
   district: string;
   learningGoal: string;
 };
-
-
 
 export type RegisterTeacherRequest = {
   firstName: string;
@@ -35,8 +32,6 @@ export type RegisterTeacherRequest = {
   musicCategoryIds: number[];
 };
 
-
-
 export type AuthResponse = {
   userId: string;
   firstName: string;
@@ -46,12 +41,27 @@ export type AuthResponse = {
   expiresAtUtc: string;
 };
 
+// ─── API Error ───────────────────────────────────────────────────────────────
+
 export type ApiErrorBody = {
   message?: string;
   title?: string;
   errors?: Record<string, string[]>;
 };
 
+export class ApiError extends Error {
+  status: number;
+  body: unknown;
+
+  constructor(message: string, status: number, body?: unknown) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.body = body;
+  }
+}
+
+// ─── Teacher ─────────────────────────────────────────────────────────────────
 
 export type TeacherListItem = {
   teacherProfileId: string;
@@ -82,11 +92,12 @@ export type TeachersListResponse = {
   totalPages: number;
 };
 
+// ─── Booking ─────────────────────────────────────────────────────────────────
 
 export type CreateBookingRequest = {
   teacherProfileId: string;
   musicCategoryId?: number | null;
-  sessionStartUtc: string; // ISO
+  sessionStartUtc: string;
   durationMinutes: number;
   studentNote?: string | null;
 };
@@ -95,27 +106,10 @@ export type BookingActionRequest = {
   note?: string | null;
 };
 
-export type CreatePaymentRequest = {
-  bookingId: string;
-};
-
-
 export type CreateBookingResponse = {
   id?: string;
   bookingId?: string;
   [key: string]: unknown;
-};
-
-export type PaymentRequestResponse = {
-  paymentUrl?: string;
-  authority?: string;
-  url?: string;
-  [key: string]: unknown;
-};
-
-export type MusicCategory = {
-  id: number;
-  name: string;
 };
 
 export type BookingItem = {
@@ -137,18 +131,44 @@ export type BookingItem = {
   [key: string]: unknown;
 };
 
+// ─── Payment ─────────────────────────────────────────────────────────────────
+
+export type CreatePaymentRequest = {
+  bookingId: string;
+};
+
+export type PaymentRequestResponse = {
+  paymentUrl?: string;
+  authority?: string;
+  url?: string;
+  [key: string]: unknown;
+};
+
+// ─── Music ───────────────────────────────────────────────────────────────────
+
+export type MusicCategory = {
+  id: number;
+  name: string;
+};
+
+// ─── Teacher Onboarding ──────────────────────────────────────────────────────
 
 export type TeacherOnboardingStatus = {
   hasResume?: boolean;
   resumeFileName?: string | null;
   resumeUploadedAtUtc?: string | null;
-  approvalStatus?: string | null; 
+  approvalStatus?: ApprovalStatus | null;
   rejectionReason?: string | null;
   [key: string]: unknown;
 };
 
+// ─── Admin ───────────────────────────────────────────────────────────────────
 
-
+export type ApprovalStatus =
+  | "PendingReview"
+  | "Approved"
+  | "Rejected"
+  | string;
 
 export type AdminTeacher = {
   teacherProfileId: string;
@@ -159,7 +179,7 @@ export type AdminTeacher = {
   district: string | null;
   yearsOfExperience: number;
   hourlyRate: number;
-  approvalStatus: string; // "Pending" | "Approved" | "Rejected" | ...
+  approvalStatus: ApprovalStatus;
   registeredAtUtc: string;
   bio: string;
   categories: string[];
@@ -174,28 +194,3 @@ export type AdminTeachersListResponse = {
   totalCount: number;
   totalPages: number;
 };
-
-export class ApiError extends Error {
-
-  status:number;
-
-  body:unknown;
-
-
-  constructor(
-    message:string,
-    status:number,
-    body?:unknown
-  ){
-
-    super(message);
-
-    this.name="ApiError";
-
-    this.status=status;
-
-    this.body=body;
-
-  }
-
-}

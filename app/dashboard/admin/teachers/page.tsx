@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Loader2, CheckCircle2, XCircle, Eye, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 
 import { DashPageHeader } from "@/components/dashboard/shared";
 import { Button } from "@/components/ui/button";
@@ -16,52 +17,33 @@ import {
 } from "@/lib/api/admin-teachers";
 import type { AdminTeacher } from "@/lib/api/types";
 
-type StatusFilter = "All" | "Pending" | "Approved" | "Rejected";
+type StatusFilter = "All" | "PendingReview" | "Approved" | "Rejected";
 
-// ✅ کامپوننت مجزا برای Badge وضعیت
+function isPending(status: string) {
+  return status?.toLowerCase() === "pendingreview";
+}
+
 function StatusBadge({ status }: { status: string }) {
   const s = status?.toLowerCase() || "";
-  if (s === "approved")
+
+  if (s === "approved") {
     return (
       <Badge className="bg-green-600/20 text-green-400 border-green-600/30">
         تأیید شده
       </Badge>
     );
-  if (s === "rejected")
+  }
+  if (s === "rejected") {
     return (
       <Badge className="bg-red-600/20 text-red-400 border-red-600/30">
         رد شده
       </Badge>
     );
+  }
   return (
     <Badge className="bg-yellow-600/20 text-yellow-400 border-yellow-600/30">
-      در انتظار
+      در انتظار بررسی
     </Badge>
-  );
-}
-
-// ✅ کامپوننت Toast ساده برای جایگزینی alert
-function Toast({
-  message,
-  type,
-  onClose,
-}: {
-  message: string;
-  type: "success" | "error";
-  onClose: () => void;
-}) {
-  useEffect(() => {
-    const t = setTimeout(onClose, 3000);
-    return () => clearTimeout(t);
-  }, [onClose]);
-
-  return (
-    <div
-      className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-5 py-3 rounded-xl shadow-lg text-sm font-medium transition-all
-        ${type === "success" ? "bg-green-600 text-white" : "bg-red-600 text-white"}`}
-    >
-      {message}
-    </div>
   );
 }
 
@@ -69,34 +51,19 @@ export default function AdminTeachersPage() {
   const [teachers, setTeachers] = useState<AdminTeacher[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("Pending");
+  const [statusFilter, setStatusFilter] =
+    useState<StatusFilter>("PendingReview");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
-  // Detail modal
   const [selected, setSelected] = useState<AdminTeacher | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
 
-  // Reject modal
   const [rejectTarget, setRejectTarget] = useState<AdminTeacher | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
 
-  // ✅ Toast state
-  const [toast, setToast] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
-
-  const showToast = useCallback(
-    (message: string, type: "success" | "error") => {
-      setToast({ message, type });
-    },
-    []
-  );
-
-  // ✅ useCallback برای جلوگیری از re-render اضافه
   const loadTeachers = useCallback(async () => {
     try {
       setLoading(true);
@@ -132,30 +99,45 @@ export default function AdminTeachersPage() {
       setSelected(full);
     } catch (err) {
       console.error(err);
-      // ✅ اگه detail لود نشد، همون اطلاعات اولیه رو نشون بده
+      // همون اطلاعات اولیه رو نشون میده
     } finally {
       setDetailLoading(false);
     }
   };
 
   const handleApprove = async (teacher: AdminTeacher) => {
-    // ✅ جایگزین confirm با state
-    if (!window.confirm(`آیا از تأیید «${teacher.fullName}» مطمئن هستید؟`))
-      return;
+    // ✅ از sonner confirm استفاده میکنیم
+    toast(`آیا از تأیید «${teacher.fullName}» مطمئن هستید؟`, {
+      action: {
+        label: "بله، تأیید کن",
+        onClick: () => confirmApprove(teacher),
+      },
+      cancel: {
+        label: "انصراف",
+        onClick: () => {},
+      },
+      duration: 6000,
+    });
+  };
 
+  const confirmApprove = async (teacher: AdminTeacher) => {
     setActionLoading(true);
+    const toastId = toast.loading(`در حال تأیید «${teacher.fullName}»...`);
+
     try {
       await approveTeacher(teacher.teacherProfileId);
-      showToast("استاد با موفقیت تأیید شد.", "success");
+
+      toast.success(`«${teacher.fullName}» با موفقیت تأیید شد.`, {
+        id: toastId,
+      });
+
       setSelected(null);
-      // ✅ اگه فیلتر Pending بود، استاد تأیید شده باید از لیست حذف بشه
       setTeachers((prev) =>
-        prev.filter((t) => t.teacherProfileId !== teacher.teacherProfileId)
+        prev.filter((t) => t.teacherProfileId !== teacher.teacherProfileId),
       );
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "خطا در تأیید استاد";
-      showToast(message, "error");
+      const message = err instanceof Error ? err.message : "خطا در تأیید استاد";
+      toast.error(message, { id: toastId });
     } finally {
       setActionLoading(false);
     }
@@ -164,43 +146,48 @@ export default function AdminTeachersPage() {
   const handleReject = async () => {
     if (!rejectTarget) return;
     if (!rejectReason.trim()) {
-      showToast("لطفاً دلیل رد را وارد کنید.", "error");
+      toast.error("لطفاً دلیل رد را وارد کنید.");
       return;
     }
 
     setActionLoading(true);
+    const toastId = toast.loading(
+      `در حال رد کردن «${rejectTarget.fullName}»...`,
+    );
+
     try {
       await rejectTeacher(rejectTarget.teacherProfileId, rejectReason.trim());
-      showToast("استاد رد شد.", "success");
+
+      toast.success(`«${rejectTarget.fullName}» با موفقیت رد شد.`, {
+        id: toastId,
+      });
+
+      setTeachers((prev) =>
+        prev.filter(
+          (t) => t.teacherProfileId !== rejectTarget.teacherProfileId,
+        ),
+      );
       setRejectTarget(null);
       setRejectReason("");
       setSelected(null);
-      // ✅ اگه فیلتر Pending بود، استاد رد شده باید از لیست حذف بشه
-      setTeachers((prev) =>
-        prev.filter(
-          (t) => t.teacherProfileId !== rejectTarget.teacherProfileId
-        )
-      );
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : "خطا در رد کردن استاد";
-      showToast(message, "error");
+      toast.error(message, { id: toastId });
     } finally {
       setActionLoading(false);
     }
   };
 
+  const filterLabel: Record<StatusFilter, string> = {
+    All: "همه",
+    PendingReview: "در انتظار بررسی",
+    Approved: "تأیید شده",
+    Rejected: "رد شده",
+  };
+
   return (
     <>
-      {/* ✅ Toast notification */}
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
-
       <DashPageHeader
         title="مدیریت اساتید"
         desc="تأیید یا رد اساتید تازه‌ثبت‌نام‌شده"
@@ -208,27 +195,21 @@ export default function AdminTeachersPage() {
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
-        {(["All", "Pending", "Approved", "Rejected"] as StatusFilter[]).map(
-          (s) => (
-            <Button
-              key={s}
-              size="sm"
-              variant={statusFilter === s ? "default" : "outline"}
-              onClick={() => {
-                setStatusFilter(s);
-                setPage(1);
-              }}
-            >
-              {s === "All"
-                ? "همه"
-                : s === "Pending"
-                ? "در انتظار"
-                : s === "Approved"
-                ? "تأیید شده"
-                : "رد شده"}
-            </Button>
-          )
-        )}
+        {(
+          ["All", "PendingReview", "Approved", "Rejected"] as StatusFilter[]
+        ).map((s) => (
+          <Button
+            key={s}
+            size="sm"
+            variant={statusFilter === s ? "gold" : "outline"}
+            onClick={() => {
+              setStatusFilter(s);
+              setPage(1);
+            }}
+          >
+            {filterLabel[s]}
+          </Button>
+        ))}
 
         <Button
           size="sm"
@@ -246,12 +227,12 @@ export default function AdminTeachersPage() {
 
       {/* Content */}
       {loading ? (
-        <div className="flex justify-center py-20 text-muted">
-          <Loader2 className="h-8 w-8 animate-spin" />
+        <div className="flex justify-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-muted" />
         </div>
       ) : error ? (
-        <div className="rounded-2xl border border-line bg-surface p-8 text-center text-red-400 space-y-3">
-          <p>{error}</p>
+        <div className="rounded-2xl border border-line bg-surface p-8 text-center space-y-3">
+          <p className="text-red-400">{error}</p>
           <Button size="sm" variant="outline" onClick={loadTeachers}>
             تلاش مجدد
           </Button>
@@ -268,6 +249,7 @@ export default function AdminTeachersPage() {
                 <tr>
                   <th className="text-right px-4 py-3 font-medium">نام</th>
                   <th className="text-right px-4 py-3 font-medium">ایمیل</th>
+                  <th className="text-right px-4 py-3 font-medium">موبایل</th>
                   <th className="text-right px-4 py-3 font-medium">شهر</th>
                   <th className="text-right px-4 py-3 font-medium">سابقه</th>
                   <th className="text-right px-4 py-3 font-medium">وضعیت</th>
@@ -285,7 +267,8 @@ export default function AdminTeachersPage() {
                   >
                     <td className="px-4 py-3 font-medium">{t.fullName}</td>
                     <td className="px-4 py-3 text-muted">{t.email}</td>
-                    <td className="px-4 py-3">{t.city}</td>
+                    <td className="px-4 py-3 text-muted">{t.phoneNumber}</td>
+                    <td className="px-4 py-3">{t.city || "—"}</td>
                     <td className="px-4 py-3">{t.yearsOfExperience} سال</td>
                     <td className="px-4 py-3">
                       <StatusBadge status={t.approvalStatus} />
@@ -293,7 +276,7 @@ export default function AdminTeachersPage() {
                     <td className="px-4 py-3 text-muted text-xs">
                       {t.registeredAtUtc
                         ? new Date(t.registeredAtUtc).toLocaleDateString(
-                            "fa-IR"
+                            "fa-IR",
                           )
                         : "—"}
                     </td>
@@ -308,7 +291,7 @@ export default function AdminTeachersPage() {
                           جزئیات
                         </Button>
 
-                        {t.approvalStatus?.toLowerCase() === "pending" && (
+                        {isPending(t.approvalStatus) && (
                           <>
                             <Button
                               size="sm"
@@ -321,7 +304,7 @@ export default function AdminTeachersPage() {
                             </Button>
                             <Button
                               size="sm"
-                              variant="destructive"
+                              variant="danger"
                               disabled={actionLoading}
                               onClick={() => {
                                 setRejectTarget(t);
@@ -341,7 +324,6 @@ export default function AdminTeachersPage() {
             </table>
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between px-4 py-3 border-t border-line text-sm text-muted">
               <span>
@@ -391,7 +373,7 @@ export default function AdminTeachersPage() {
               </div>
             ) : (
               <>
-                <div className="space-y-2 text-sm">
+                <div className="space-y-2.5 text-sm">
                   <div>
                     <span className="text-muted">نام:</span> {selected.fullName}
                   </div>
@@ -404,7 +386,7 @@ export default function AdminTeachersPage() {
                   </div>
                   <div>
                     <span className="text-muted">شهر / منطقه:</span>{" "}
-                    {selected.city}
+                    {selected.city || "—"}
                     {selected.district ? ` - ${selected.district}` : ""}
                   </div>
                   <div>
@@ -413,26 +395,31 @@ export default function AdminTeachersPage() {
                   </div>
                   <div>
                     <span className="text-muted">نرخ ساعتی:</span>{" "}
-                    {selected.hourlyRate?.toLocaleString("fa-IR")} تومان
+                    {selected.hourlyRate > 0
+                      ? `${selected.hourlyRate.toLocaleString("fa-IR")} تومان`
+                      : "—"}
                   </div>
-                  <div>
-                    <span className="text-muted">وضعیت:</span>{" "}
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted">وضعیت:</span>
                     <StatusBadge status={selected.approvalStatus} />
                   </div>
+
                   {selected.rejectionReason && (
                     <div className="rounded-lg bg-red-500/10 border border-red-500/20 p-3 text-red-400 text-xs">
                       <span className="font-medium">دلیل رد:</span>{" "}
                       {selected.rejectionReason}
                     </div>
                   )}
+
                   <div>
                     <span className="text-muted">بیوگرافی:</span>
-                    <p className="mt-1 text-sm leading-relaxed text-foreground/80">
+                    <p className="mt-1 leading-relaxed text-foreground/80">
                       {selected.bio || "—"}
                     </p>
                   </div>
+
                   {selected.categories?.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-2">
+                    <div className="flex flex-wrap gap-1.5 mt-1">
                       {selected.categories.map((c) => (
                         <Badge key={c} variant="gold">
                           {c}
@@ -442,7 +429,7 @@ export default function AdminTeachersPage() {
                   )}
                 </div>
 
-                {selected.approvalStatus?.toLowerCase() === "pending" && (
+                {isPending(selected.approvalStatus) && (
                   <div className="flex gap-3 pt-4 border-t border-line">
                     <Button
                       className="flex-1 bg-green-600 hover:bg-green-700"
@@ -459,7 +446,7 @@ export default function AdminTeachersPage() {
                       )}
                     </Button>
                     <Button
-                      variant="destructive"
+                      variant="danger"
                       className="flex-1"
                       disabled={actionLoading}
                       onClick={() => {
@@ -485,7 +472,9 @@ export default function AdminTeachersPage() {
             <h3 className="text-lg font-bold">رد کردن استاد</h3>
             <p className="text-sm text-muted">
               در حال رد کردن:{" "}
-              <strong className="text-foreground">{rejectTarget.fullName}</strong>
+              <strong className="text-foreground">
+                {rejectTarget.fullName}
+              </strong>
             </p>
 
             <div className="space-y-1.5">
@@ -500,7 +489,7 @@ export default function AdminTeachersPage() {
 
             <div className="flex gap-3">
               <Button
-                variant="destructive"
+                variant="danger"
                 className="flex-1"
                 disabled={actionLoading || !rejectReason.trim()}
                 onClick={handleReject}

@@ -74,6 +74,49 @@ const itemVariants: Variants = {
   },
 };
 
+function normalizeRole(role: string | undefined | null): string {
+  return (role ?? "").toLowerCase();
+}
+
+function getDashboardPath(role: string): string {
+  switch (role) {
+    case "admin":
+      return "/dashboard/admin/teachers";
+    case "teacher":
+      return "/dashboard/teacher";
+    case "student":
+      return "/dashboard/student";
+    default:
+      return "/";
+  }
+}
+
+function getRoleLabel(role: string): string {
+  switch (role) {
+    case "admin":
+      return "ادمین";
+    case "teacher":
+      return "استاد";
+    case "student":
+      return "هنرجو";
+    default:
+      return "کاربر";
+  }
+}
+
+function getRoleBadgeClasses(role: string): string {
+  switch (role) {
+    case "admin":
+      return "bg-purple-500/20 text-purple-400";
+    case "teacher":
+      return "bg-amber-500/20 text-amber-400";
+    case "student":
+      return "bg-sky-500/20 text-sky-400";
+    default:
+      return "bg-gray-500/20 text-gray-400";
+  }
+}
+
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -85,7 +128,11 @@ export function Navbar() {
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
 
-  const isTeacher = user?.role === "Teacher";
+  const role = normalizeRole(user?.role);
+  const dashboardPath = getDashboardPath(role);
+  const roleLabel = getRoleLabel(role);
+  const roleBadgeClasses = getRoleBadgeClasses(role);
+  const isAdmin = role === "admin";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -124,7 +171,7 @@ export function Navbar() {
           "fixed inset-x-0 top-0 z-[100] flex items-center justify-between px-6 md:px-10 transition-all duration-300",
           scrolled
             ? "bg-bg/75 backdrop-blur-xl border-b border-line py-3.5"
-            : "bg-gradient-to-b from-bg/70 to-transparent py-5",
+            : "bg-gradient-to-b from-bg/70 to-transparent py-5"
         )}
       >
         <Link
@@ -195,13 +242,9 @@ export function Navbar() {
                         {user.firstName} {user.lastName}
                       </div>
                       <div
-                        className={`mt-1.5 inline-flex rounded-full px-2.5 py-0.5 text-xs ${
-                          isTeacher
-                            ? "bg-amber-500/20 text-amber-400"
-                            : "bg-sky-500/20 text-sky-400"
-                        }`}
+                        className={`mt-1.5 inline-flex rounded-full px-2.5 py-0.5 text-xs ${roleBadgeClasses}`}
                       >
-                        {isTeacher ? "استاد" : "هنرجو"}
+                        {roleLabel}
                       </div>
                     </div>
 
@@ -213,14 +256,10 @@ export function Navbar() {
                         className="justify-start"
                       >
                         <Link
-                          href={
-                            isTeacher
-                              ? "/dashboard/teacher"
-                              : "/dashboard/student"
-                          }
+                          href={dashboardPath}
                           onClick={() => setUserMenuOpen(false)}
                         >
-                          پنل کاربری
+                          {isAdmin ? "پنل مدیریت" : "پنل کاربری"}
                         </Link>
                       </Button>
 
@@ -257,7 +296,6 @@ export function Navbar() {
       <AnimatePresence>
         {open && (
           <>
-            {/* Backdrop */}
             <motion.div
               variants={backdropVariants}
               initial="hidden"
@@ -267,7 +305,6 @@ export function Navbar() {
               onClick={() => setOpen(false)}
             />
 
-            {/* Panel */}
             <motion.aside
               variants={panelVariants}
               initial="hidden"
@@ -275,7 +312,6 @@ export function Navbar() {
               exit="exit"
               className="fixed inset-y-0 right-0 z-[210] flex w-[min(86vw,340px)] flex-col bg-bg/98 shadow-[-12px_0_40px_rgba(0,0,0,0.18)] border-l border-line/80 lg:hidden"
             >
-              {/* Header */}
               <div className="relative flex items-center justify-between px-5 py-5 border-b border-line/70">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gold/10">
@@ -298,7 +334,6 @@ export function Navbar() {
                 </button>
               </div>
 
-              {/* Links */}
               <motion.nav
                 variants={listVariants}
                 initial="hidden"
@@ -321,7 +356,6 @@ export function Navbar() {
                 </ul>
               </motion.nav>
 
-              {/* Footer */}
               <div className="shrink-0 space-y-3 border-t border-line/70 bg-ink/[0.015] p-4">
                 <Button
                   variant="glass"
@@ -369,13 +403,9 @@ export function Navbar() {
                             {user.firstName} {user.lastName}
                           </div>
                           <div
-                            className={`mt-1 inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-medium ${
-                              isTeacher
-                                ? "bg-amber-500/15 text-amber-400"
-                                : "bg-sky-500/15 text-sky-400"
-                            }`}
+                            className={`mt-1 inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-medium ${roleBadgeClasses}`}
                           >
-                            {isTeacher ? "استاد" : "هنرجو"}
+                            {roleLabel}
                           </div>
                         </div>
                       </div>
@@ -383,14 +413,10 @@ export function Navbar() {
 
                     <Button asChild className="w-full rounded-2xl py-5">
                       <Link
-                        href={
-                          isTeacher
-                            ? "/dashboard/teacher"
-                            : "/dashboard/student"
-                        }
+                        href={dashboardPath}
                         onClick={() => setOpen(false)}
                       >
-                        پنل کاربری
+                        {isAdmin ? "پنل مدیریت" : "پنل کاربری"}
                       </Link>
                     </Button>
 

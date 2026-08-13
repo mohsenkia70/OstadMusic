@@ -1,8 +1,14 @@
 import { apiRequest } from "./client";
 import type { AdminTeacher, AdminTeachersListResponse } from "./types";
 
+// ✅ مقادیر واقعی که API قبول میکنه
+export type ApprovalStatusFilter = 
+  | "PendingReview" 
+  | "Approved" 
+  | "Rejected";
+
 export type GetAdminTeachersParams = {
-  status?: string; // "Pending" | "Approved" | "Rejected" | ...
+  status?: ApprovalStatusFilter;
   page?: number;
   pageSize?: number;
 };

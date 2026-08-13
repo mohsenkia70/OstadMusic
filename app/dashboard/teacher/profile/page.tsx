@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Camera, Upload, UserRound, Loader2, Star } from "lucide-react";
+import { toast } from "sonner";
 
 import { DashPageHeader } from "@/components/dashboard/shared";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,7 +17,18 @@ import { useAuthStore } from "@/lib/store/auth-store";
 import { getTeacherById } from "@/lib/api/teachers";
 import type { TeacherDetail } from "@/lib/api/types";
 
-export default function TeacherProfilePage() {
+function TeacherProfileFallback() {
+  return (
+    <>
+      <DashPageHeader title="پروفایل استاد" desc="در حال بارگذاری..." />
+      <div className="flex items-center justify-center py-24 text-muted">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    </>
+  );
+}
+
+function TeacherProfileContent() {
   const searchParams = useSearchParams();
   const user = useAuthStore((s) => s.user);
   const hasHydrated = useAuthStore((s) => s.hasHydrated);
@@ -24,17 +36,12 @@ export default function TeacherProfilePage() {
   const clearAvatar = useProfileStore((s) => s.clearAvatar);
 
   const userId = user?.userId ?? "";
-  const role = user?.role ?? "";
-  const isTeacher = role === "Teacher";
-  const isAdmin = role === "Admin" || role === "admin";
+  const role = String(user?.role ?? "").toLowerCase();
+  const isTeacher = role === "teacher";
+  const isAdmin = role === "admin";
 
-  // اولویت گرفتن teacherProfileId:
-  // ۱. از query string (?id=...)
-  // ۲. از user (اگر بعداً ذخیره کردی)
   const teacherProfileId =
-    searchParams.get("id") ||
-    (user as any)?.teacherProfileId ||
-    "";
+    searchParams.get("id") || (user as { teacherProfileId?: string } | null)?.teacherProfileId || "";
 
   const avatarPreview = useProfileStore((s) =>
     userId ? s.avatars[userId] ?? null : null
@@ -56,18 +63,15 @@ export default function TeacherProfilePage() {
     bio: "",
   });
 
-  // ------------------- Fetch -------------------
   useEffect(() => {
     if (!hasHydrated) return;
 
-    // ادمین یا استاد هر دو اجازه ورود دارن
     if (!user || (!isTeacher && !isAdmin)) {
       setLoading(false);
       setError("دسترسی به این صفحه ندارید.");
       return;
     }
 
-    // اگر teacherProfileId نداریم، خطا بده (مخصوصاً برای ادمین)
     if (!teacherProfileId) {
       setLoading(false);
       setError(
@@ -97,14 +101,14 @@ export default function TeacherProfilePage() {
           hourlyRate: String(data.hourlyRate ?? 0),
           bio: data.bio ?? "",
         });
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (cancelled) return;
         console.error(err);
-        setError(
-          err?.message ||
-            err?.body?.title ||
-            "خطا در دریافت اطلاعات پروفایل"
-        );
+
+        const message =
+          err instanceof Error ? err.message : "خطا در دریافت اطلاعات پروفایل";
+
+        setError(message);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -117,9 +121,7 @@ export default function TeacherProfilePage() {
     };
   }, [hasHydrated, user, isTeacher, isAdmin, teacherProfileId]);
 
-  // ------------------- Avatar -------------------
   const handleAvatarClick = () => {
-    // فقط خود استاد بتونه عکس عوض کنه
     if (!isTeacher) return;
     fileInputRef.current?.click();
   };
@@ -129,12 +131,12 @@ export default function TeacherProfilePage() {
     if (!selected || !userId || !isTeacher) return;
 
     if (!selected.type.startsWith("image/")) {
-      alert("لطفاً فقط فایل تصویری انتخاب کنید.");
+      toast.error("لطفاً فقط فایل تصویری انتخاب کنید.");
       return;
     }
 
     if (selected.size > 2 * 1024 * 1024) {
-      alert("حجم تصویر نباید بیشتر از ۲ مگابایت باشد.");
+      toast.error("حجم تصویر نباید بیشتر از ۲ مگابایت باشد.");
       return;
     }
 
@@ -142,9 +144,10 @@ export default function TeacherProfilePage() {
     reader.onload = () => {
       const result = reader.result as string;
       setAvatar(userId, result);
+      toast.success("عکس پروفایل با موفقیت انتخاب شد.");
     };
     reader.onerror = () => {
-      alert("خطا در خواندن فایل. لطفاً دوباره تلاش کنید.");
+      toast.error("خطا در خواندن فایل. لطفاً دوباره تلاش کنید.");
     };
     reader.readAsDataURL(selected);
     e.target.value = "";
@@ -156,9 +159,9 @@ export default function TeacherProfilePage() {
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+    toast.success("عکس پروفایل حذف شد.");
   };
 
-  // ------------------- Form -------------------
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -167,7 +170,7 @@ export default function TeacherProfilePage() {
   };
 
   const handleSave = async () => {
-    if (!profile || !isTeacher) return; // فقط استاد بتونه ذخیره کنه
+    if (!profile || !isTeacher) return;
 
     setSaving(true);
     try {
@@ -177,7 +180,8 @@ export default function TeacherProfilePage() {
         yearsOfExperience: Number(form.yearsOfExperience) || 0,
         hourlyRate: Number(form.hourlyRate) || 0,
       });
-      alert("تغییرات با موفقیت ذخیره شد (فعلاً فقط سمت کلاینت)");
+
+      toast.success("تغییرات با موفقیت ذخیره شد.");
     } finally {
       setSaving(false);
     }
@@ -195,16 +199,8 @@ export default function TeacherProfilePage() {
     });
   };
 
-  // ------------------- Render -------------------
   if (!hasHydrated || loading) {
-    return (
-      <>
-        <DashPageHeader title="پروفایل استاد" desc="در حال بارگذاری..." />
-        <div className="flex items-center justify-center py-24 text-muted">
-          <Loader2 className="h-8 w-8 animate-spin" />
-        </div>
-      </>
-    );
+    return <TeacherProfileFallback />;
   }
 
   if (error || !profile) {
@@ -222,7 +218,7 @@ export default function TeacherProfilePage() {
   }
 
   const displayName = form.fullName || "استاد";
-  const canEdit = isTeacher; // فقط خود استاد بتونه ویرایش کنه
+  const canEdit = isTeacher;
 
   return (
     <>
@@ -236,7 +232,6 @@ export default function TeacherProfilePage() {
       />
 
       <div className="rounded-2xl border border-line bg-surface p-7 max-w-2xl">
-        {/* Avatar Section */}
         <div className="flex items-center gap-5 mb-8">
           <div className="relative group">
             <Avatar
@@ -291,9 +286,7 @@ export default function TeacherProfilePage() {
             <div className="text-muted text-sm mt-0.5">استاد</div>
 
             <div className="flex flex-wrap items-center gap-2 mt-2.5">
-              {profile.isVerified && (
-                <Badge variant="gold">تأیید شده</Badge>
-              )}
+              {profile.isVerified && <Badge variant="gold">تأیید شده</Badge>}
 
               {profile.ratingCount > 0 && (
                 <div className="flex items-center gap-1 text-sm text-muted">
@@ -333,7 +326,6 @@ export default function TeacherProfilePage() {
           </div>
         </div>
 
-        {/* Form */}
         <form
           className="space-y-5"
           onSubmit={(e) => {
@@ -412,7 +404,6 @@ export default function TeacherProfilePage() {
             />
           </div>
 
-          {/* Categories */}
           <div>
             <Label>برچسب‌های تخصص</Label>
             <div className="flex flex-wrap gap-2 mt-2">
@@ -430,8 +421,7 @@ export default function TeacherProfilePage() {
             </div>
           </div>
 
-          {/* Read-only info */}
-          <div className="grid sm:grid-cols-2 gap-4 pt-1 text-sm text-muted border-t border-line mt-2 pt-5">
+          <div className="grid sm:grid-cols-2 gap-4 text-sm text-muted border-t border-line mt-2 pt-5">
             <div>
               <span className="block text-xs mb-1 opacity-70">ایمیل</span>
               <span>{profile.email || "—"}</span>
@@ -462,5 +452,13 @@ export default function TeacherProfilePage() {
         </form>
       </div>
     </>
+  );
+}
+
+export default function TeacherProfilePage() {
+  return (
+    <Suspense fallback={<TeacherProfileFallback />}>
+      <TeacherProfileContent />
+    </Suspense>
   );
 }

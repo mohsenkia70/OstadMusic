@@ -8,9 +8,8 @@ import { DashboardMobileNav } from "@/components/dashboard/mobile-nav";
 import { useAuthStore } from "@/lib/store/auth-store";
 
 const items: NavItem[] = [
-  { href: "/dashboard/admin", label: "داشبورد", icon: LayoutDashboard },
+ 
   { href: "/dashboard/admin/teachers", label: "مدیریت اساتید", icon: Users },
-  { href: "/dashboard/admin/settings", label: "تنظیمات", icon: Settings },
 ];
 
 // ✅ تابع کمکی برای normalize کردن role
