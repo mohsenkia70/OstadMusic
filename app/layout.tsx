@@ -5,11 +5,16 @@ import "@fontsource/vazirmatn/arabic-600.css";
 import "@fontsource/vazirmatn/arabic-700.css";
 import "@fontsource/vazirmatn/arabic-800.css";
 import "@fontsource/vazirmatn/arabic-900.css";
+
 import "@fontsource/estedad/arabic-300.css";
 import "@fontsource/estedad/arabic-400.css";
 import "@fontsource/estedad/arabic-500.css";
 import "@fontsource/estedad/arabic-600.css";
+
 import "./globals.css";
+
+import { Toaster } from "sonner";
+
 import { SmoothScrollProvider } from "@/components/layout/smooth-scroll-provider";
 import { CartProvider } from "@/components/cart/cart-provider";
 import { CartDrawer } from "@/components/cart/cart-drawer";
@@ -32,6 +37,13 @@ export default function RootLayout({
           <CartProvider>
             {children}
             <CartDrawer />
+
+            <Toaster
+              position="top-center"
+              dir="rtl"
+              richColors
+              closeButton
+            />
           </CartProvider>
         </SmoothScrollProvider>
       </body>

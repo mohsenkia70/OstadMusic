@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Camera, Upload, UserRound, Loader2, Star } from "lucide-react";
 
 import { DashPageHeader } from "@/components/dashboard/shared";
@@ -12,17 +13,28 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useProfileStore } from "@/lib/store/profile-store";
 import { useAuthStore } from "@/lib/store/auth-store";
-import { getTeacherById, getTeachers } from "@/lib/api/teachers";
+import { getTeacherById } from "@/lib/api/teachers";
 import type { TeacherDetail } from "@/lib/api/types";
 
 export default function TeacherProfilePage() {
+  const searchParams = useSearchParams();
   const user = useAuthStore((s) => s.user);
   const hasHydrated = useAuthStore((s) => s.hasHydrated);
   const setAvatar = useProfileStore((s) => s.setAvatar);
   const clearAvatar = useProfileStore((s) => s.clearAvatar);
 
   const userId = user?.userId ?? "";
-  const isTeacher = user?.role === "Teacher";
+  const role = user?.role ?? "";
+  const isTeacher = role === "Teacher";
+  const isAdmin = role === "Admin" || role === "admin";
+
+  // اولویت گرفتن teacherProfileId:
+  // ۱. از query string (?id=...)
+  // ۲. از user (اگر بعداً ذخیره کردی)
+  const teacherProfileId =
+    searchParams.get("id") ||
+    (user as any)?.teacherProfileId ||
+    "";
 
   const avatarPreview = useProfileStore((s) =>
     userId ? s.avatars[userId] ?? null : null
@@ -44,13 +56,25 @@ export default function TeacherProfilePage() {
     bio: "",
   });
 
-  // ------------------- Resolve teacherProfileId & fetch -------------------
+  // ------------------- Fetch -------------------
   useEffect(() => {
     if (!hasHydrated) return;
 
-    if (!user || !isTeacher) {
+    // ادمین یا استاد هر دو اجازه ورود دارن
+    if (!user || (!isTeacher && !isAdmin)) {
       setLoading(false);
-      setError("این صفحه فقط برای اساتید در دسترس است.");
+      setError("دسترسی به این صفحه ندارید.");
+      return;
+    }
+
+    // اگر teacherProfileId نداریم، خطا بده (مخصوصاً برای ادمین)
+    if (!teacherProfileId) {
+      setLoading(false);
+      setError(
+        isAdmin
+          ? "برای مشاهده پروفایل استاد، آدرس را به صورت زیر باز کنید:\n/dashboard/teacher/profile?id=TEACHER_PROFILE_ID"
+          : "شناسه پروفایل استاد یافت نشد. ممکن است هنوز تأیید نشده باشید."
+      );
       return;
     }
 
@@ -61,32 +85,6 @@ export default function TeacherProfilePage() {
         setLoading(true);
         setError(null);
 
-        // ۱. اول سعی می‌کنیم teacherProfileId رو پیدا کنیم
-        // (موقتی: از لیست اساتید جستجو می‌کنیم)
-        let teacherProfileId: string | null =
-          (user as any)?.teacherProfileId ?? null;
-
-        if (!teacherProfileId) {
-          // جستجو در لیست اساتید بر اساس userId
-          const listRes = await getTeachers({
-            page: 1,
-            pageSize: 100, // اگر تعداد اساتید بیشتره، این عدد رو بالاتر ببر
-          });
-
-          const found = listRes.items.find(
-            (item) => item.userId === userId
-          );
-
-          if (!found) {
-            throw new Error(
-              "پروفایل استادی برای این حساب کاربری یافت نشد."
-            );
-          }
-
-          teacherProfileId = found.teacherProfileId;
-        }
-
-        // ۲. گرفتن جزئیات کامل پروفایل
         const data = await getTeacherById(teacherProfileId);
         if (cancelled) return;
 
@@ -117,16 +115,18 @@ export default function TeacherProfilePage() {
     return () => {
       cancelled = true;
     };
-  }, [hasHydrated, user, isTeacher, userId]);
+  }, [hasHydrated, user, isTeacher, isAdmin, teacherProfileId]);
 
-  // ------------------- Avatar handlers -------------------
+  // ------------------- Avatar -------------------
   const handleAvatarClick = () => {
+    // فقط خود استاد بتونه عکس عوض کنه
+    if (!isTeacher) return;
     fileInputRef.current?.click();
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
-    if (!selected || !userId) return;
+    if (!selected || !userId || !isTeacher) return;
 
     if (!selected.type.startsWith("image/")) {
       alert("لطفاً فقط فایل تصویری انتخاب کنید.");
@@ -151,14 +151,14 @@ export default function TeacherProfilePage() {
   };
 
   const handleRemoveAvatar = () => {
-    if (!userId) return;
+    if (!userId || !isTeacher) return;
     clearAvatar(userId);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
-  // ------------------- Form handlers -------------------
+  // ------------------- Form -------------------
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -167,20 +167,16 @@ export default function TeacherProfilePage() {
   };
 
   const handleSave = async () => {
-    if (!profile) return;
+    if (!profile || !isTeacher) return; // فقط استاد بتونه ذخیره کنه
 
     setSaving(true);
     try {
-      // فعلاً فقط لاگ می‌کنیم.
-      // وقتی endpoint آپدیت پروفایل داشتی، اینجا صدا بزن.
       console.log("Saving profile:", {
         teacherProfileId: profile.teacherProfileId,
         ...form,
         yearsOfExperience: Number(form.yearsOfExperience) || 0,
         hourlyRate: Number(form.hourlyRate) || 0,
-        avatarBase64Length: avatarPreview?.length ?? 0,
       });
-
       alert("تغییرات با موفقیت ذخیره شد (فعلاً فقط سمت کلاینت)");
     } finally {
       setSaving(false);
@@ -199,14 +195,11 @@ export default function TeacherProfilePage() {
     });
   };
 
-  // ------------------- Render states -------------------
+  // ------------------- Render -------------------
   if (!hasHydrated || loading) {
     return (
       <>
-        <DashPageHeader
-          title="پروفایل من"
-          desc="در حال بارگذاری اطلاعات..."
-        />
+        <DashPageHeader title="پروفایل استاد" desc="در حال بارگذاری..." />
         <div className="flex items-center justify-center py-24 text-muted">
           <Loader2 className="h-8 w-8 animate-spin" />
         </div>
@@ -218,10 +211,10 @@ export default function TeacherProfilePage() {
     return (
       <>
         <DashPageHeader
-          title="پروفایل من"
-          desc="این اطلاعات برای هنرجوان روی صفحه‌ی عمومی‌ات نمایش داده می‌شود."
+          title="پروفایل استاد"
+          desc="مشاهده و ویرایش اطلاعات استاد"
         />
-        <div className="rounded-2xl border border-line bg-surface p-8 max-w-2xl text-center text-red-400">
+        <div className="rounded-2xl border border-line bg-surface p-8 max-w-2xl text-center text-red-400 whitespace-pre-line">
           {error || "اطلاعاتی یافت نشد."}
         </div>
       </>
@@ -229,12 +222,17 @@ export default function TeacherProfilePage() {
   }
 
   const displayName = form.fullName || "استاد";
+  const canEdit = isTeacher; // فقط خود استاد بتونه ویرایش کنه
 
   return (
     <>
       <DashPageHeader
-        title="پروفایل من"
-        desc="این اطلاعات برای هنرجوان روی صفحه‌ی عمومی‌ات نمایش داده می‌شود."
+        title={isAdmin ? "مشاهده پروفایل استاد" : "پروفایل من"}
+        desc={
+          isAdmin
+            ? "در حال مشاهده پروفایل به عنوان ادمین"
+            : "این اطلاعات برای هنرجوان روی صفحه‌ی عمومی‌ات نمایش داده می‌شود."
+        }
       />
 
       <div className="rounded-2xl border border-line bg-surface p-7 max-w-2xl">
@@ -243,7 +241,9 @@ export default function TeacherProfilePage() {
           <div className="relative group">
             <Avatar
               onClick={handleAvatarClick}
-              className="h-24 w-24 rounded-3xl cursor-pointer overflow-hidden border border-line shadow-sm"
+              className={`h-24 w-24 rounded-3xl overflow-hidden border border-line shadow-sm ${
+                canEdit ? "cursor-pointer" : ""
+              }`}
             >
               {avatarPreview ? (
                 <AvatarImage
@@ -260,18 +260,22 @@ export default function TeacherProfilePage() {
                 </AvatarFallback>
               )}
 
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center rounded-3xl">
-                <Camera className="text-white h-7 w-7" />
-              </div>
+              {canEdit && (
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center rounded-3xl">
+                  <Camera className="text-white h-7 w-7" />
+                </div>
+              )}
             </Avatar>
 
-            <button
-              type="button"
-              onClick={handleAvatarClick}
-              className="absolute -bottom-2 -left-2 h-9 w-9 rounded-full bg-gold text-[#181209] flex items-center justify-center shadow-lg hover:scale-105 transition"
-            >
-              <Upload className="h-4 w-4" />
-            </button>
+            {canEdit && (
+              <button
+                type="button"
+                onClick={handleAvatarClick}
+                className="absolute -bottom-2 -left-2 h-9 w-9 rounded-full bg-gold text-[#181209] flex items-center justify-center shadow-lg hover:scale-105 transition"
+              >
+                <Upload className="h-4 w-4" />
+              </button>
+            )}
 
             <input
               ref={fileInputRef}
@@ -304,26 +308,28 @@ export default function TeacherProfilePage() {
               )}
             </div>
 
-            <div className="flex items-center gap-3 mt-3">
-              <button
-                type="button"
-                onClick={handleAvatarClick}
-                className="flex items-center gap-1.5 text-xs text-gold hover:underline"
-              >
-                <Upload className="h-3.5 w-3.5" />
-                {avatarPreview ? "تغییر عکس" : "آپلود عکس"}
-              </button>
-
-              {avatarPreview && (
+            {canEdit && (
+              <div className="flex items-center gap-3 mt-3">
                 <button
                   type="button"
-                  onClick={handleRemoveAvatar}
-                  className="text-xs text-red-400 hover:underline"
+                  onClick={handleAvatarClick}
+                  className="flex items-center gap-1.5 text-xs text-gold hover:underline"
                 >
-                  حذف عکس
+                  <Upload className="h-3.5 w-3.5" />
+                  {avatarPreview ? "تغییر عکس" : "آپلود عکس"}
                 </button>
-              )}
-            </div>
+
+                {avatarPreview && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveAvatar}
+                    className="text-xs text-red-400 hover:underline"
+                  >
+                    حذف عکس
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -332,7 +338,7 @@ export default function TeacherProfilePage() {
           className="space-y-5"
           onSubmit={(e) => {
             e.preventDefault();
-            handleSave();
+            if (canEdit) handleSave();
           }}
         >
           <div className="grid sm:grid-cols-2 gap-5">
@@ -342,6 +348,7 @@ export default function TeacherProfilePage() {
                 name="fullName"
                 value={form.fullName}
                 onChange={handleChange}
+                disabled={!canEdit}
               />
             </div>
 
@@ -351,6 +358,7 @@ export default function TeacherProfilePage() {
                 name="city"
                 value={form.city}
                 onChange={handleChange}
+                disabled={!canEdit}
               />
             </div>
           </div>
@@ -363,6 +371,7 @@ export default function TeacherProfilePage() {
                 value={form.district}
                 onChange={handleChange}
                 placeholder="مثلاً ونک"
+                disabled={!canEdit}
               />
             </div>
 
@@ -374,6 +383,7 @@ export default function TeacherProfilePage() {
                 min={0}
                 value={form.yearsOfExperience}
                 onChange={handleChange}
+                disabled={!canEdit}
               />
             </div>
           </div>
@@ -386,6 +396,7 @@ export default function TeacherProfilePage() {
               min={0}
               value={form.hourlyRate}
               onChange={handleChange}
+              disabled={!canEdit}
             />
           </div>
 
@@ -397,6 +408,7 @@ export default function TeacherProfilePage() {
               value={form.bio}
               onChange={handleChange}
               placeholder="درباره خودت، سابقه تدریس و سبک آموزش بنویس..."
+              disabled={!canEdit}
             />
           </div>
 
@@ -430,21 +442,23 @@ export default function TeacherProfilePage() {
             </div>
           </div>
 
-          <div className="flex gap-3 pt-4">
-            <Button type="submit" disabled={saving}>
-              {saving ? (
-                <>
-                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                  در حال ذخیره...
-                </>
-              ) : (
-                "ذخیره تغییرات"
-              )}
-            </Button>
-            <Button type="button" variant="outline" onClick={handleCancel}>
-              انصراف
-            </Button>
-          </div>
+          {canEdit && (
+            <div className="flex gap-3 pt-4">
+              <Button type="submit" disabled={saving}>
+                {saving ? (
+                  <>
+                    <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                    در حال ذخیره...
+                  </>
+                ) : (
+                  "ذخیره تغییرات"
+                )}
+              </Button>
+              <Button type="button" variant="outline" onClick={handleCancel}>
+                انصراف
+              </Button>
+            </div>
+          )}
         </form>
       </div>
     </>

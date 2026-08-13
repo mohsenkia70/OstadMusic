@@ -24,76 +24,53 @@ export type AuthUser = {
 
 type AuthState = {
   user: AuthUser | null;
-
   accessToken: string | null;
-
   expiresAtUtc: string | null;
-
   isLoading: boolean;
-
   error: string | null;
-
   hasHydrated: boolean;
 
   login: (emailOrPhone: string, password: string) => Promise<AuthUser>;
-
   registerStudent: (data: RegisterStudentRequest) => Promise<AuthUser>;
-
   registerTeacher: (data: RegisterTeacherRequest) => Promise<AuthUser>;
-
   logout: () => void;
-
   clearError: () => void;
-
   isTokenExpired: () => boolean;
+  // ✅ اضافه شد
+  setHasHydrated: (value: boolean) => void;
 };
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       user: null,
-
       accessToken: null,
-
       expiresAtUtc: null,
-
       isLoading: false,
-
       error: null,
-
       hasHydrated: false,
 
+      // ✅ action جدید برای set کردن hasHydrated
+      setHasHydrated: (value) => set({ hasHydrated: value }),
+
       login: async (emailOrPhone, password) => {
-        set({
-          isLoading: true,
-          error: null,
-        });
+        set({ isLoading: true, error: null });
 
         try {
-          const res = await loginRequest({
-            emailOrPhone,
-            password,
-          });
+          const res = await loginRequest({ emailOrPhone, password });
 
           const user: AuthUser = {
             userId: res.userId,
-
             firstName: res.firstName,
-
             lastName: res.lastName,
-
             role: res.role,
           };
 
           set({
             user,
-
             accessToken: res.accessToken,
-
             expiresAtUtc: res.expiresAtUtc,
-
             isLoading: false,
-
             error: null,
           });
 
@@ -106,13 +83,9 @@ export const useAuthStore = create<AuthState>()(
 
           set({
             isLoading: false,
-
             error: message,
-
             user: null,
-
             accessToken: null,
-
             expiresAtUtc: null,
           });
 
@@ -121,95 +94,67 @@ export const useAuthStore = create<AuthState>()(
       },
 
       registerStudent: async (data) => {
-        set({
-          isLoading: true,
-
-          error: null,
-        });
+        set({ isLoading: true, error: null });
 
         try {
           const res = await registerStudentRequest(data);
 
           const user: AuthUser = {
             userId: res.userId,
-
             firstName: res.firstName,
-
             lastName: res.lastName,
-
             role: res.role,
           };
 
           set({
             user,
-
             accessToken: res.accessToken,
-
             expiresAtUtc: res.expiresAtUtc,
-
             isLoading: false,
-
             error: null,
           });
 
           return user;
         } catch (err) {
           const message =
-            err instanceof ApiError ? err.message : "ثبت‌نام هنرجو ناموفق بود.";
+            err instanceof ApiError
+              ? err.message
+              : "ثبت‌نام هنرجو ناموفق بود.";
 
-          set({
-            isLoading: false,
-
-            error: message,
-          });
-
+          set({ isLoading: false, error: message });
           throw err;
         }
       },
 
       registerTeacher: async (data) => {
-        set({
-          isLoading: true,
-
-          error: null,
-        });
+        set({ isLoading: true, error: null });
 
         try {
           const res = await registerTeacherRequest(data);
 
           const user: AuthUser = {
             userId: res.userId,
-
             firstName: res.firstName,
-
             lastName: res.lastName,
-
             role: res.role,
           };
 
           set({
             user,
-
             accessToken: res.accessToken,
-
             expiresAtUtc: res.expiresAtUtc,
-
             isLoading: false,
-
             error: null,
           });
 
           return user;
         } catch (err) {
           const message =
-            err instanceof ApiError ? err.message : "ثبت‌نام استاد ناموفق بود.";
+            err instanceof ApiError
+              ? err.message
+              : "ثبت‌نام استاد ناموفق بود.";
 
-          set({
-            isLoading: false,
-
-            error: message,
-          });
-
+          set({ isLoading: false, error: message });
           throw err;
         }
       },
@@ -217,26 +162,17 @@ export const useAuthStore = create<AuthState>()(
       logout: () => {
         set({
           user: null,
-
           accessToken: null,
-
           expiresAtUtc: null,
-
           error: null,
         });
       },
 
-      clearError: () => {
-        set({
-          error: null,
-        });
-      },
+      clearError: () => set({ error: null }),
 
       isTokenExpired: () => {
         const { expiresAtUtc } = get();
-
         if (!expiresAtUtc) return true;
-
         return new Date(expiresAtUtc).getTime() <= Date.now();
       },
     }),
@@ -244,19 +180,18 @@ export const useAuthStore = create<AuthState>()(
     {
       name: "ostad-music-auth",
 
+      // ✅ درست‌شده: از setHasHydrated استفاده میکنیم
       onRehydrateStorage: () => (state) => {
         if (state) {
-          state.hasHydrated = true;
+          state.setHasHydrated(true);
         }
       },
 
       partialize: (state) => ({
         user: state.user,
-
         accessToken: state.accessToken,
-
         expiresAtUtc: state.expiresAtUtc,
       }),
-    },
-  ),
+    }
+  )
 );

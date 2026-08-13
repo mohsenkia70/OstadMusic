@@ -4,7 +4,6 @@ import { useAuthStore } from "@/lib/store/auth-store";
 
 type ApiRequestOptions = Omit<RequestInit, "body"> & {
   body?: unknown;
-  /** Set to false for endpoints that don't need the Authorization header (e.g. login). */
   auth?: boolean;
 };
 
@@ -20,24 +19,16 @@ function extractErrorMessage(status: number, body: unknown): string {
   }
   if (typeof body === "string" && body.trim().length > 0) return body;
   if (status === 401) return "ایمیل/موبایل یا رمز عبور اشتباه است.";
+  if (status === 403) return "شما دسترسی به این بخش را ندارید.";
   if (status === 404) return "منبع موردنظر پیدا نشد.";
   if (status >= 500) return "خطایی در سرور رخ داد. کمی بعد دوباره تلاش کن.";
   return "خطایی رخ داد. لطفاً دوباره تلاش کن.";
 }
 
-/**
- * Generic API request helper — use this for ANY endpoint your friend's backend
- * exposes, not just auth. It automatically:
- *   - prefixes the path with API_BASE_URL
- *   - serializes `body` as JSON and sets the right headers
- *   - attaches `Authorization: Bearer <token>` from the auth store (unless `auth: false`)
- *   - parses the JSON response and throws a typed ApiError on failure
- *
- * Example:
- *   const teachers = await apiRequest<TeacherDto[]>("/teachers");
- *   const created = await apiRequest<BookingDto>("/bookings", { method: "POST", body: { teacherId } });
- */
-export async function apiRequest<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
+export async function apiRequest<T>(
+  path: string,
+  options: ApiRequestOptions = {}
+): Promise<T> {
   const { body, auth = true, headers, ...rest } = options;
 
   const finalHeaders: Record<string, string> = {
@@ -59,7 +50,20 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
   } catch {
-    throw new ApiError("اتصال به سرور برقرار نشد. اینترنت یا آدرس API را بررسی کن.", 0);
+    throw new ApiError(
+      "اتصال به سرور برقرار نشد. اینترنت یا آدرس API را بررسی کن.",
+      0
+    );
+  }
+
+  // ✅ اگه 401 گرفتیم و auth=true بود، یعنی توکن expire شده
+  // کاربر رو logout کن
+  if (response.status === 401 && auth) {
+    useAuthStore.getState().logout();
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
+    throw new ApiError("نشست شما منقضی شده. لطفاً دوباره وارد شوید.", 401);
   }
 
   const contentType = response.headers.get("content-type") || "";
@@ -68,9 +72,12 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
     : await response.text().catch(() => null);
 
   if (!response.ok) {
-    throw new ApiError(extractErrorMessage(response.status, payload), response.status, payload);
+    throw new ApiError(
+      extractErrorMessage(response.status, payload),
+      response.status,
+      payload
+    );
   }
 
-  // Handle 204 No Content and similar empty-but-ok responses
   return payload as T;
 }

@@ -111,8 +111,8 @@ export default function SignupPage() {
         </>
       }
     >
-      {/* Role Selector */}
-      <div className="grid grid-cols-2 gap-3 mb-8">
+      {/* Role Selector – compact */}
+      <div className="grid grid-cols-2 gap-2.5 mb-4">
         <button
           type="button"
           onClick={() => {
@@ -120,13 +120,13 @@ export default function SignupPage() {
             setRole("student");
           }}
           className={cn(
-            "flex flex-col items-center gap-2.5 rounded-2xl border p-4 text-[13.5px] font-medium transition-all duration-300",
+            "flex flex-col items-center gap-1.5 rounded-xl border py-2.5 px-2 text-[12.5px] font-medium transition-all duration-300",
             role === "student"
-              ? "border-[#d4a84b]/50 bg-[#d4a84b]/10 text-[#d4a84b] shadow-[0_0_24px_rgba(212,168,75,0.12)]"
+              ? "border-[#d4a84b]/50 bg-[#d4a84b]/10 text-[#d4a84b] shadow-[0_0_18px_rgba(212,168,75,0.12)]"
               : "border-[#2c2822] text-[#8a8278] hover:border-[#3a352e] hover:text-[#b0a69a]"
           )}
         >
-          <GraduationCap className="h-5 w-5" />
+          <GraduationCap className="h-4.5 w-4.5" />
           هنرجو هستم
         </button>
 
@@ -137,30 +137,30 @@ export default function SignupPage() {
             setRole("teacher");
           }}
           className={cn(
-            "flex flex-col items-center gap-2.5 rounded-2xl border p-4 text-[13.5px] font-medium transition-all duration-300",
+            "flex flex-col items-center gap-1.5 rounded-xl border py-2.5 px-2 text-[12.5px] font-medium transition-all duration-300",
             role === "teacher"
-              ? "border-[#d4a84b]/50 bg-[#d4a84b]/10 text-[#d4a84b] shadow-[0_0_24px_rgba(212,168,75,0.12)]"
+              ? "border-[#d4a84b]/50 bg-[#d4a84b]/10 text-[#d4a84b] shadow-[0_0_18px_rgba(212,168,75,0.12)]"
               : "border-[#2c2822] text-[#8a8278] hover:border-[#3a352e] hover:text-[#b0a69a]"
           )}
         >
-          <Music2 className="h-5 w-5" />
+          <Music2 className="h-4.5 w-4.5" />
           استاد هستم
         </button>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-2.5" noValidate>
         {error && (
-          <div className="flex items-start gap-2.5 rounded-2xl bg-red-500/10 border border-red-500/20 p-3.5 text-[13px] text-red-300">
-            <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-red-400" />
+          <div className="flex items-start gap-2 rounded-xl bg-red-500/10 border border-red-500/20 px-3 py-2 text-[12px] text-red-300">
+            <AlertCircle className="h-3.5 w-3.5 shrink-0 mt-0.5 text-red-400" />
             <span>{error}</span>
           </div>
         )}
 
         {/* Full Name */}
-        <div className="space-y-2.5">
+        <div className="space-y-1">
           <Label
             htmlFor="fullName"
-            className="text-[#d4cfc4] text-[13.5px] font-medium"
+            className="text-[#d4cfc4] text-[12.5px] font-medium"
           >
             نام و نام خانوادگی
           </Label>
@@ -169,7 +169,7 @@ export default function SignupPage() {
             placeholder="مثلا محسن کیا"
             onFocus={clearError}
             className={cn(
-              "h-14 rounded-2xl text-[15px]",
+              "h-10 rounded-xl text-[13.5px]",
               "bg-[#16140f]/75 border-[#2c2822] text-[#f5f0e6]",
               "placeholder:text-[#5e574e]",
               "focus-visible:ring-2 focus-visible:ring-[#d4a84b]/35 focus-visible:border-[#d4a84b]/45",
@@ -178,17 +178,17 @@ export default function SignupPage() {
             {...register("fullName", { required: true })}
           />
           {errors.fullName && (
-            <p className="text-[13px] text-red-400/90 mt-1.5">
+            <p className="text-[11.5px] text-red-400/90 mt-0.5">
               این فیلد الزامی است
             </p>
           )}
         </div>
 
         {/* Email */}
-        <div className="space-y-2.5">
+        <div className="space-y-1">
           <Label
             htmlFor="email"
-            className="text-[#d4cfc4] text-[13.5px] font-medium"
+            className="text-[#d4cfc4] text-[12.5px] font-medium"
           >
             ایمیل
           </Label>
@@ -197,7 +197,7 @@ export default function SignupPage() {
             placeholder="example@gmail.com"
             onFocus={clearError}
             className={cn(
-              "h-14 rounded-2xl text-[15px]",
+              "h-10 rounded-xl text-[13.5px]",
               "bg-[#16140f]/75 border-[#2c2822] text-[#f5f0e6]",
               "placeholder:text-[#5e574e]",
               "focus-visible:ring-2 focus-visible:ring-[#d4a84b]/35 focus-visible:border-[#d4a84b]/45",
@@ -206,17 +206,17 @@ export default function SignupPage() {
             {...register("email", { required: true })}
           />
           {errors.email && (
-            <p className="text-[13px] text-red-400/90 mt-1.5">
+            <p className="text-[11.5px] text-red-400/90 mt-0.5">
               ایمیل الزامی است
             </p>
           )}
         </div>
 
         {/* Phone */}
-        <div className="space-y-2.5">
+        <div className="space-y-1">
           <Label
             htmlFor="phoneNumber"
-            className="text-[#d4cfc4] text-[13.5px] font-medium"
+            className="text-[#d4cfc4] text-[12.5px] font-medium"
           >
             شماره تماس
           </Label>
@@ -225,7 +225,7 @@ export default function SignupPage() {
             placeholder="09123456789"
             onFocus={clearError}
             className={cn(
-              "h-14 rounded-2xl text-[15px]",
+              "h-10 rounded-xl text-[13.5px]",
               "bg-[#16140f]/75 border-[#2c2822] text-[#f5f0e6]",
               "placeholder:text-[#5e574e]",
               "focus-visible:ring-2 focus-visible:ring-[#d4a84b]/35 focus-visible:border-[#d4a84b]/45",
@@ -234,17 +234,17 @@ export default function SignupPage() {
             {...register("phoneNumber", { required: true })}
           />
           {errors.phoneNumber && (
-            <p className="text-[13px] text-red-400/90 mt-1.5">
+            <p className="text-[11.5px] text-red-400/90 mt-0.5">
               شماره تماس الزامی است
             </p>
           )}
         </div>
 
         {/* Password */}
-        <div className="space-y-2.5">
+        <div className="space-y-1">
           <Label
             htmlFor="password"
-            className="text-[#d4cfc4] text-[13.5px] font-medium"
+            className="text-[#d4cfc4] text-[12.5px] font-medium"
           >
             رمز عبور
           </Label>
@@ -254,7 +254,7 @@ export default function SignupPage() {
             placeholder="حداقل ۸ کاراکتر"
             onFocus={clearError}
             className={cn(
-              "h-14 rounded-2xl text-[15px]",
+              "h-10 rounded-xl text-[13.5px]",
               "bg-[#16140f]/75 border-[#2c2822] text-[#f5f0e6]",
               "placeholder:text-[#5e574e]",
               "focus-visible:ring-2 focus-visible:ring-[#d4a84b]/35 focus-visible:border-[#d4a84b]/45",
@@ -263,7 +263,7 @@ export default function SignupPage() {
             {...register("password", { required: true, minLength: 8 })}
           />
           {errors.password && (
-            <p className="text-[13px] text-red-400/90 mt-1.5">
+            <p className="text-[11.5px] text-red-400/90 mt-0.5">
               رمز عبور باید حداقل ۸ کاراکتر باشد
             </p>
           )}
@@ -273,19 +273,19 @@ export default function SignupPage() {
           type="submit"
           size="lg"
           className={cn(
-            "w-full h-14 rounded-2xl text-[15.5px] font-semibold gap-2 mt-2",
+            "w-full h-10 rounded-xl text-[13.5px] font-semibold gap-2 mt-1",
             "bg-gradient-to-l from-[#d4a84b] via-[#e0b85c] to-[#d4a84b]",
             "text-[#1a160f] hover:brightness-110",
-            "shadow-[0_10px_36px_rgba(212,168,75,0.28)]",
+            "shadow-[0_6px_24px_rgba(212,168,75,0.22)]",
             "transition-all duration-300 active:scale-[0.985]"
           )}
           disabled={isLoading}
         >
-          {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+          {isLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
           {role === "student" ? "ساخت حساب هنرجو" : "ساخت حساب استاد"}
         </Button>
 
-        <p className="text-[12.5px] text-[#6f685e] text-center leading-6 pt-1">
+        <p className="text-[11.5px] text-[#6f685e] text-center leading-5 pt-0.5">
           با ثبت‌نام، شرایط استفاده و حریم خصوصی استاد موزیک را می‌پذیری.
         </p>
       </form>

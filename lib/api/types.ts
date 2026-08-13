@@ -147,6 +147,34 @@ export type TeacherOnboardingStatus = {
   [key: string]: unknown;
 };
 
+
+
+
+export type AdminTeacher = {
+  teacherProfileId: string;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  city: string;
+  district: string | null;
+  yearsOfExperience: number;
+  hourlyRate: number;
+  approvalStatus: string; // "Pending" | "Approved" | "Rejected" | ...
+  registeredAtUtc: string;
+  bio: string;
+  categories: string[];
+  rejectionReason: string | null;
+  reviewedAtUtc: string | null;
+};
+
+export type AdminTeachersListResponse = {
+  items: AdminTeacher[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+};
+
 export class ApiError extends Error {
 
   status:number;
