@@ -28,7 +28,7 @@ const links = [
   { href: "/teachers", label: "اساتید", icon: Users },
   { href: "/shop", label: "فروشگاه", icon: ShoppingBag },
   { href: "/#how", label: "چگونه کار می‌کند", icon: Info },
-  { href: "/chatbot", label: "دستیار هوشمند", icon: Bot },
+  // { href: "/chatbot", label: "دستیار هوشمند", icon: Bot },
   { href: "/blog", label: "وبلاگ", icon: BookOpen },
   { href: "/faq", label: "سوالات متداول", icon: HelpCircle },
   { href: "/about", label: "درباره ما", icon: Info },
@@ -38,7 +38,7 @@ const bottomNavItems = [
   { href: "/", label: "خانه", icon: Home },
   { href: "/teachers", label: "اساتید", icon: Users },
   { href: "/shop", label: "فروشگاه", icon: ShoppingBag },
-  { href: "/chatbot", label: "دستیار", icon: Bot },
+  // { href: "/chatbot", label: "دستیار", icon: Bot },
   { href: "/blog", label: "وبلاگ", icon: BookOpen },
 ];
 
