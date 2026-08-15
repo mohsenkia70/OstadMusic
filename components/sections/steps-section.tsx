@@ -9,21 +9,21 @@ const steps = [
     title: "استاد را پیدا کن",
     desc: "با فیلتر سبک، شهر، سطح و بازه‌ی زمانی، از میان اساتید تاییدشده انتخاب کن.",
     color: "#0d9488",
-    image: "/assets/images/1.png",
+    image: "/icons/1.png",
   },
   {
     num: "۰۲",
     title: "کلاسِ خودتو رزرو کن",
     desc: "یک جلسه‌ی کوتاه و رایگان برای اینکه ببینی حس همکاری‌تان چطور است.",
     color: "#d4af37",
-    image: "/assets/images/2.png",
+    image: "/icons/2.png",
   },
   {
     num: "۰۳",
     title: "مسیر یادگیری را شروع کن",
     desc: "برنامه‌ی هفتگی بچین، پیشرفتت را دنبال کن و قدم‌به‌قدم بهتر شو.",
     color: "#7c93ff",
-    image: "/assets/images/3.png",
+    image: "/icons/3.png",
   },
 ];
 
