@@ -1,9 +1,11 @@
 {
+  "id": "/",
   "name": "استاد موزیک",
   "short_name": "استاد موزیک",
   "description": "پلتفرم آموزش موسیقی آنلاین - اتصال هنرجو به بهترین اساتید",
   "start_url": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
   "background_color": "#ffffff",
   "theme_color": "#0d9488",
   "orientation": "portrait-primary",
@@ -36,5 +38,22 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/mobile.png",
+      "sizes": "1170x2532",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "صفحه اصلی استاد موزیک در موبایل"
+    },
+    {
+      "src": "/screenshots/desktop.png",
+      "sizes": "3988x1426",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "نمای دسکتاپ استاد موزیک"
+    }
+  ],
+  "prefer_related_applications": false
 }
