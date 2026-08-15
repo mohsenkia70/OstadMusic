@@ -2,23 +2,44 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
-import { Menu, X, ShoppingBag, User } from "lucide-react";
+import {
+  Menu,
+  X,
+  ShoppingBag,
+  User,
+  Home,
+  Users,
+  Bot,
+  BookOpen,
+  HelpCircle,
+  Info,
+  LogOut,
+  LayoutDashboard,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/components/cart/cart-provider";
-import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { LogoMark } from "@/components/logo-mark";
 import { cn } from "@/lib/utils";
 
 const links = [
-  { href: "/teachers", label: "اساتید" },
-  { href: "/shop", label: "فروشگاه" },
-  { href: "/#how", label: "چگونه کار می‌کند" },
-  { href: "/chatbot", label: "دستیار هوشمند" },
-  { href: "/blog", label: "وبلاگ" },
-  { href: "/faq", label: "سوالات متداول" },
-  { href: "/about", label: "درباره ما" },
+  { href: "/teachers", label: "اساتید", icon: Users },
+  { href: "/shop", label: "فروشگاه", icon: ShoppingBag },
+  { href: "/#how", label: "چگونه کار می‌کند", icon: Info },
+  { href: "/chatbot", label: "دستیار هوشمند", icon: Bot },
+  { href: "/blog", label: "وبلاگ", icon: BookOpen },
+  { href: "/faq", label: "سوالات متداول", icon: HelpCircle },
+  { href: "/about", label: "درباره ما", icon: Info },
+];
+
+const bottomNavItems = [
+  { href: "/", label: "خانه", icon: Home },
+  { href: "/teachers", label: "اساتید", icon: Users },
+  { href: "/shop", label: "فروشگاه", icon: ShoppingBag },
+  { href: "/chatbot", label: "دستیار", icon: Bot },
+  { href: "/blog", label: "وبلاگ", icon: BookOpen },
 ];
 
 const backdropVariants: Variants = {
@@ -34,23 +55,23 @@ const backdropVariants: Variants = {
 };
 
 const panelVariants: Variants = {
-  hidden: { x: "100%" },
+  hidden: { y: "100%" },
   visible: {
-    x: 0,
+    y: 0,
     transition: {
       type: "spring",
-      damping: 32,
+      damping: 28,
       stiffness: 320,
-      mass: 0.8,
+      mass: 0.85,
     },
   },
   exit: {
-    x: "100%",
+    y: "100%",
     transition: {
       type: "spring",
-      damping: 36,
+      damping: 32,
       stiffness: 380,
-      mass: 0.7,
+      mass: 0.75,
     },
   },
 };
@@ -59,18 +80,18 @@ const listVariants: Variants = {
   hidden: {},
   visible: {
     transition: {
-      staggerChildren: 0.05,
-      delayChildren: 0.12,
+      staggerChildren: 0.04,
+      delayChildren: 0.08,
     },
   },
 };
 
 const itemVariants: Variants = {
-  hidden: { opacity: 0, x: 24 },
+  hidden: { opacity: 0, y: 16 },
   visible: {
     opacity: 1,
-    x: 0,
-    transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] },
+    y: 0,
+    transition: { duration: 0.32, ease: [0.25, 0.46, 0.45, 0.94] },
   },
 };
 
@@ -123,6 +144,7 @@ export function Navbar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
+  const pathname = usePathname();
   const { totalCount, openCart } = useCart();
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
@@ -136,7 +158,7 @@ export function Navbar() {
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -164,8 +186,14 @@ export function Navbar() {
     };
   }, [open]);
 
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href);
+  };
+
   return (
     <>
+      {/* ===== هدر ===== */}
       <nav
         className={cn(
           "fixed inset-x-0 top-0 z-[100] flex items-center justify-between px-6 md:px-10 transition-all duration-300",
@@ -182,6 +210,7 @@ export function Navbar() {
           استاد موزیک
         </Link>
 
+        {/* لینک‌های دسکتاپ */}
         <div className="hidden lg:flex items-center gap-9 text-[0.95rem] text-muted">
           {links.map((l) => (
             <Link
@@ -195,6 +224,7 @@ export function Navbar() {
           ))}
         </div>
 
+        {/* اکشن‌های دسکتاپ */}
         <div className="hidden lg:flex items-center gap-3">
           <button
             onClick={openCart}
@@ -283,6 +313,7 @@ export function Navbar() {
           )}
         </div>
 
+
         <button
           className="lg:hidden flex h-10 w-10 items-center justify-center rounded-xl text-ink hover:bg-ink/5 transition-colors order-first"
           onClick={() => setOpen(true)}
@@ -292,7 +323,81 @@ export function Navbar() {
         </button>
       </nav>
 
-      {/* منوی موبایل */}
+
+      <nav className="fixed bottom-0 inset-x-0 z-[100] lg:hidden">
+        <div className="mx-3 mb-3 rounded-2xl border border-line/80 bg-bg/90 backdrop-blur-xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] overflow-hidden">
+          <div className="flex items-center justify-between px-1.5 py-2">
+            {bottomNavItems.map((item) => {
+              const active = isActive(item.href);
+              const Icon = item.icon;
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="relative flex flex-1 flex-col items-center justify-center gap-1 py-1.5"
+                >
+                  <motion.div
+                    className={cn(
+                      "relative flex h-10 w-10 items-center justify-center rounded-xl transition-colors",
+                      active ? "text-gold" : "text-ink/60 hover:text-ink"
+                    )}
+                    whileTap={{ scale: 0.88 }}
+                  >
+                    {active && (
+                      <motion.span
+                        layoutId="bottom-nav-active"
+                        className="absolute inset-0 rounded-xl bg-gold/15"
+                        transition={{
+                          type: "spring",
+                          stiffness: 380,
+                          damping: 30,
+                        }}
+                      />
+                    )}
+                    <Icon
+                      className={cn(
+                        "h-5 w-5 relative z-10 transition-transform",
+                        active && "scale-110"
+                      )}
+                      strokeWidth={active ? 2.4 : 1.9}
+                    />
+                  </motion.div>
+
+                  <span
+                    className={cn(
+                      "text-[11px] font-medium transition-colors",
+                      active ? "text-gold" : "text-ink/55"
+                    )}
+                  >
+                    {item.label}
+                  </span>
+                </Link>
+              );
+            })}
+
+            {/* سبد خرید */}
+            <button
+              onClick={openCart}
+              className="relative flex flex-1 flex-col items-center justify-center gap-1 py-1.5"
+            >
+              <motion.div
+                className="relative flex h-10 w-10 items-center justify-center rounded-xl text-ink/60 hover:text-ink"
+                whileTap={{ scale: 0.88 }}
+              >
+                <ShoppingBag className="h-5 w-5" strokeWidth={1.9} />
+                {totalCount > 0 && (
+                  <span className="absolute -top-0.5 -end-0.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-bold text-[#181209]">
+                    {totalCount > 9 ? "۹+" : totalCount.toLocaleString("fa-IR")}
+                  </span>
+                )}
+              </motion.div>
+              <span className="text-[11px] font-medium text-ink/55">سبد</span>
+            </button>
+          </div>
+        </div>
+      </nav>
+
       <AnimatePresence>
         {open && (
           <>
@@ -301,7 +406,7 @@ export function Navbar() {
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="fixed inset-0 z-[200] bg-black/55 backdrop-blur-[6px] lg:hidden"
+              className="fixed inset-0 z-[200] bg-black/50 backdrop-blur-[5px] lg:hidden"
               onClick={() => setOpen(false)}
             />
 
@@ -310,9 +415,15 @@ export function Navbar() {
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="fixed inset-y-0 right-0 z-[210] flex w-[min(86vw,340px)] flex-col bg-bg/98 shadow-[-12px_0_40px_rgba(0,0,0,0.18)] border-l border-line/80 lg:hidden"
+              className="fixed inset-x-0 bottom-0 z-[210] max-h-[85vh] flex flex-col rounded-t-[28px] bg-bg/98 border-t border-line/80 shadow-[0_-12px_40px_rgba(0,0,0,0.18)] lg:hidden overflow-hidden"
             >
-              <div className="relative flex items-center justify-between px-5 py-5 border-b border-line/70">
+              {/* Handle */}
+              <div className="flex justify-center pt-3 pb-1">
+                <div className="h-1.5 w-12 rounded-full bg-ink/15" />
+              </div>
+
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 py-3 border-b border-line/60">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gold/10">
                     <LogoMark className="h-6 w-6" />
@@ -321,7 +432,7 @@ export function Navbar() {
                     <div className="font-display text-[1.05rem] font-extrabold leading-none">
                       استاد موزیک
                     </div>
-                    <div className="mt-1 text-[11px] text-muted">منوی اصلی</div>
+                    <div className="mt-1 text-[11px] text-muted">منوی بیشتر</div>
                   </div>
                 </div>
 
@@ -334,46 +445,37 @@ export function Navbar() {
                 </button>
               </div>
 
+              {/* لیست لینک‌ها */}
               <motion.nav
                 variants={listVariants}
                 initial="hidden"
                 animate="visible"
-                className="flex-1 overflow-y-auto px-3 py-5"
+                className="flex-1 overflow-y-auto px-3 py-4"
               >
                 <ul className="space-y-1">
-                  {links.map((l) => (
-                    <motion.li key={l.href} variants={itemVariants}>
-                      <Link
-                        href={l.href}
-                        onClick={() => setOpen(false)}
-                        className="group flex items-center justify-between rounded-2xl px-4 py-3.5 text-[0.95rem] font-medium text-ink/80 transition-all duration-200 hover:bg-gold/10 hover:text-ink"
-                      >
-                        <span>{l.label}</span>
-                        <span className="h-1.5 w-1.5 rounded-full bg-gold/0 transition-all duration-300 group-hover:bg-gold group-hover:scale-125" />
-                      </Link>
-                    </motion.li>
-                  ))}
+                  {links.map((l) => {
+                    const Icon = l.icon;
+                    return (
+                      <motion.li key={l.href} variants={itemVariants}>
+                        <Link
+                          href={l.href}
+                          onClick={() => setOpen(false)}
+                          className="group flex items-center gap-3.5 rounded-2xl px-4 py-3.5 text-[0.95rem] font-medium text-ink/80 transition-all duration-200 hover:bg-gold/10 hover:text-ink"
+                        >
+                          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink/5 text-ink/70 group-hover:bg-gold/15 group-hover:text-gold transition-colors">
+                            <Icon className="h-4.5 w-4.5" />
+                          </div>
+                          <span className="flex-1">{l.label}</span>
+                          <span className="h-1.5 w-1.5 rounded-full bg-gold/0 transition-all duration-300 group-hover:bg-gold group-hover:scale-125" />
+                        </Link>
+                      </motion.li>
+                    );
+                  })}
                 </ul>
               </motion.nav>
 
-              <div className="shrink-0 space-y-3 border-t border-line/70 bg-ink/[0.015] p-4">
-                <Button
-                  variant="glass"
-                  className="w-full justify-center gap-2.5 rounded-2xl py-5 text-[0.95rem]"
-                  onClick={() => {
-                    setOpen(false);
-                    openCart();
-                  }}
-                >
-                  <ShoppingBag className="h-4.5 w-4.5" />
-                  سبد خرید
-                  {totalCount > 0 && (
-                    <span className="ms-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-gold px-1.5 text-[11px] font-bold text-[#181209]">
-                      {totalCount.toLocaleString("fa-IR")}
-                    </span>
-                  )}
-                </Button>
-
+              {/* فوتر */}
+              <div className="shrink-0 space-y-3 border-t border-line/70 bg-ink/[0.015] p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
                 {!user ? (
                   <div className="grid grid-cols-2 gap-2.5">
                     <Button
@@ -416,6 +518,7 @@ export function Navbar() {
                         href={dashboardPath}
                         onClick={() => setOpen(false)}
                       >
+                        <LayoutDashboard className="h-4.5 w-4.5 me-2" />
                         {isAdmin ? "پنل مدیریت" : "پنل کاربری"}
                       </Link>
                     </Button>
@@ -429,6 +532,7 @@ export function Navbar() {
                         router.push("/");
                       }}
                     >
+                      <LogOut className="h-4.5 w-4.5 me-2" />
                       خروج از حساب
                     </Button>
                   </div>
@@ -438,6 +542,7 @@ export function Navbar() {
           </>
         )}
       </AnimatePresence>
+      <div className="h-24 lg:hidden" />
     </>
   );
 }
