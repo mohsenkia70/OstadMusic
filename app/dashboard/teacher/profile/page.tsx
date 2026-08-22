@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 import { DashPageHeader } from "@/components/dashboard/shared";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { TeacherLocationSection } from "@/components/dashboard/teacher-location-section";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -403,6 +404,18 @@ function TeacherProfileContent() {
               disabled={!canEdit}
             />
           </div>
+
+
+{canEdit && (
+  <div className="pt-6">
+    <TeacherLocationSection
+    // اگر بعداً از API موقعیت برگشت، می‌تونی اینجا پاس بدی:
+    // initialLat={profile.latitude}
+    // initialLng={profile.longitude}
+    />
+  </div>
+)}
+
 
           <div>
             <Label>برچسب‌های تخصص</Label>

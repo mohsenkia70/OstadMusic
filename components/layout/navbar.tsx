@@ -5,18 +5,16 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import {
-  Menu,
-  X,
   ShoppingBag,
   User,
   Home,
   Users,
-  Bot,
   BookOpen,
   HelpCircle,
   Info,
   LogOut,
   LayoutDashboard,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/components/cart/cart-provider";
@@ -24,76 +22,22 @@ import { useAuthStore } from "@/lib/store/auth-store";
 import { LogoMark } from "@/components/logo-mark";
 import { cn } from "@/lib/utils";
 
-const links = [
-  { href: "/teachers", label: "اساتید", icon: Users },
-  { href: "/shop", label: "فروشگاه", icon: ShoppingBag },
-  { href: "/#how", label: "چگونه کار می‌کند", icon: Info },
-  // { href: "/chatbot", label: "دستیار هوشمند", icon: Bot },
-  { href: "/blog", label: "وبلاگ", icon: BookOpen },
-  { href: "/faq", label: "سوالات متداول", icon: HelpCircle },
-  { href: "/about", label: "درباره ما", icon: Info },
+
+const desktopLinks = [
+  { href: "/teachers", label: "اساتید" },
+  { href: "/shop", label: "فروشگاه" },
+  { href: "/blog", label: "وبلاگ" },
+  { href: "/faq", label: "سوالات متداول" },
+  { href: "/about", label: "درباره ما" },
 ];
+
 
 const bottomNavItems = [
   { href: "/", label: "خانه", icon: Home },
   { href: "/teachers", label: "اساتید", icon: Users },
   { href: "/shop", label: "فروشگاه", icon: ShoppingBag },
-  // { href: "/chatbot", label: "دستیار", icon: Bot },
   { href: "/blog", label: "وبلاگ", icon: BookOpen },
 ];
-
-const backdropVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { duration: 0.3, ease: "easeOut" },
-  },
-  exit: {
-    opacity: 0,
-    transition: { duration: 0.25, ease: "easeIn" },
-  },
-};
-
-const panelVariants: Variants = {
-  hidden: { y: "100%" },
-  visible: {
-    y: 0,
-    transition: {
-      type: "spring",
-      damping: 28,
-      stiffness: 320,
-      mass: 0.85,
-    },
-  },
-  exit: {
-    y: "100%",
-    transition: {
-      type: "spring",
-      damping: 32,
-      stiffness: 380,
-      mass: 0.75,
-    },
-  },
-};
-
-const listVariants: Variants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.04,
-      delayChildren: 0.08,
-    },
-  },
-};
-
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.32, ease: [0.25, 0.46, 0.45, 0.94] },
-  },
-};
 
 function normalizeRole(role: string | undefined | null): string {
   return (role ?? "").toLowerCase();
@@ -140,7 +84,6 @@ function getRoleBadgeClasses(role: string): string {
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
-  const [open, setOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
@@ -175,17 +118,6 @@ export function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [open]);
-
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
     return pathname.startsWith(href);
@@ -193,26 +125,27 @@ export function Navbar() {
 
   return (
     <>
-      {/* ===== هدر ===== */}
-      <nav
+
+      <header
         className={cn(
-          "fixed inset-x-0 top-0 z-[100] flex items-center justify-between px-6 md:px-10 transition-all duration-300",
+          "fixed inset-x-0 top-0 z-[100] flex items-center justify-between px-4 md:px-8 transition-all duration-300",
           scrolled
-            ? "bg-bg/75 backdrop-blur-xl border-b border-line py-3.5"
-            : "bg-gradient-to-b from-bg/70 to-transparent py-5"
+            ? "bg-bg/75 backdrop-blur-xl border-b border-line py-3"
+            : "bg-gradient-to-b from-bg/70 to-transparent py-4"
         )}
       >
+
         <Link
           href="/"
           className="flex items-center gap-2.5 font-display text-xl font-extrabold"
         >
           <LogoMark className="h-8 w-8" />
-          استاد موزیک
+          <span className="hidden sm:inline">استاد موزیک</span>
         </Link>
 
-        {/* لینک‌های دسکتاپ */}
-        <div className="hidden lg:flex items-center gap-9 text-[0.95rem] text-muted">
-          {links.map((l) => (
+
+        <div className="hidden lg:flex items-center gap-7 text-[0.95rem] text-muted">
+          {desktopLinks.map((l) => (
             <Link
               key={l.href}
               href={l.href}
@@ -224,8 +157,8 @@ export function Navbar() {
           ))}
         </div>
 
-        {/* اکشن‌های دسکتاپ */}
-        <div className="hidden lg:flex items-center gap-3">
+   
+        <div className="flex items-center gap-2">
           <button
             onClick={openCart}
             className="relative flex h-10 w-10 items-center justify-center rounded-xl text-ink/85 hover:text-gold transition-colors"
@@ -239,93 +172,109 @@ export function Navbar() {
             )}
           </button>
 
-          {user === null ? (
-            <>
-              <Button asChild variant="ghost" size="sm">
-                <Link href="/login">ورود</Link>
-              </Button>
-              <Button asChild size="sm">
-                <Link href="/signup">حساب کاربری</Link>
-              </Button>
-            </>
-          ) : (
-            <div className="relative" ref={userMenuRef}>
-              <button
-                onClick={() => setUserMenuOpen((prev) => !prev)}
+
+          <div className="hidden lg:block">
+            {user === null ? (
+              <div className="flex items-center gap-2">
+                <Button asChild variant="ghost" size="sm">
+                  <Link href="/login">ورود</Link>
+                </Button>
+                <Button asChild size="sm">
+                  <Link href="/signup">ثبت‌ نام</Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="relative" ref={userMenuRef}>
+                <button
+                  onClick={() => setUserMenuOpen((prev) => !prev)}
+                  className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium text-ink/85 hover:bg-ink/5 hover:text-ink transition-colors"
+                >
+                  <User className="h-5 w-5" />
+                  <span className="hidden xl:inline">{user?.firstName}</span>
+                  <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+                </button>
+
+                <AnimatePresence>
+                  {userMenuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                      transition={{ duration: 0.18 }}
+                      className="absolute left-0 top-full mt-2 w-56 rounded-2xl border border-line bg-bg/95 backdrop-blur-xl shadow-xl overflow-hidden z-50"
+                    >
+                      <div className="px-4 py-3 border-b border-line">
+                        <div className="font-bold text-sm">
+                          {user.firstName} {user.lastName}
+                        </div>
+                        <div
+                          className={`mt-1.5 inline-flex rounded-full px-2.5 py-0.5 text-xs ${roleBadgeClasses}`}
+                        >
+                          {roleLabel}
+                        </div>
+                      </div>
+
+                      <div className="p-2 flex flex-col gap-1">
+                        <Button
+                          asChild
+                          variant="ghost"
+                          size="sm"
+                          className="justify-start"
+                        >
+                          <Link
+                            href={dashboardPath}
+                            onClick={() => setUserMenuOpen(false)}
+                          >
+                            <LayoutDashboard className="h-4 w-4 ml-2" />
+                            {isAdmin ? "پنل مدیریت" : "پنل کاربری"}
+                          </Link>
+                        </Button>
+
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="justify-start text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                          onClick={() => {
+                            logout();
+                            setUserMenuOpen(false);
+                            router.push("/");
+                          }}
+                        >
+                          <LogOut className="h-4 w-4 ml-2" />
+                          خروج
+                        </Button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
+          </div>
+
+
+          <div className="lg:hidden">
+            {user === null ? (
+              <Link
+                href="/login"
                 className="flex h-10 w-10 items-center justify-center rounded-xl text-ink/85 hover:text-gold hover:bg-ink/5 transition-colors"
-                aria-label="منوی کاربر"
               >
                 <User className="h-5 w-5" />
-              </button>
-
-              <AnimatePresence>
-                {userMenuOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                    transition={{ duration: 0.18 }}
-                    className="absolute end-0 top-full mt-2 w-56 rounded-2xl border border-line bg-bg/95 backdrop-blur-xl shadow-xl overflow-hidden z-50"
-                  >
-                    <div className="px-4 py-3 border-b border-line">
-                      <div className="font-bold text-sm">
-                        {user.firstName} {user.lastName}
-                      </div>
-                      <div
-                        className={`mt-1.5 inline-flex rounded-full px-2.5 py-0.5 text-xs ${roleBadgeClasses}`}
-                      >
-                        {roleLabel}
-                      </div>
-                    </div>
-
-                    <div className="p-2 flex flex-col gap-1">
-                      <Button
-                        asChild
-                        variant="ghost"
-                        size="sm"
-                        className="justify-start"
-                      >
-                        <Link
-                          href={dashboardPath}
-                          onClick={() => setUserMenuOpen(false)}
-                        >
-                          {isAdmin ? "پنل مدیریت" : "پنل کاربری"}
-                        </Link>
-                      </Button>
-
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="justify-start text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                        onClick={() => {
-                          logout();
-                          setUserMenuOpen(false);
-                          router.push("/");
-                        }}
-                      >
-                        خروج
-                      </Button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          )}
+              </Link>
+            ) : (
+              <Link
+                href={dashboardPath}
+                className="flex h-10 w-10 items-center justify-center rounded-xl text-ink/85 hover:text-gold hover:bg-ink/5 transition-colors"
+              >
+                <User className="h-5 w-5" />
+              </Link>
+            )}
+          </div>
         </div>
-
-
-        <button
-          className="lg:hidden flex h-10 w-10 items-center justify-center rounded-xl text-ink hover:bg-ink/5 transition-colors order-first"
-          onClick={() => setOpen(true)}
-          aria-label="باز کردن منو"
-        >
-          <Menu className="h-6 w-6" />
-        </button>
-      </nav>
+      </header>
 
 
       <nav className="fixed bottom-0 inset-x-0 z-[100] lg:hidden">
-        <div className="mx-3 mb-3 rounded-2xl border border-line/80 bg-bg/90 backdrop-blur-xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] overflow-hidden">
+        <div className="mx-2 mb-2 rounded-2xl border border-line/80 bg-bg/95 backdrop-blur-xl shadow-[0_-8px_30px_rgba(0,0,0,0.12)] overflow-hidden">
           <div className="flex items-center justify-between px-1.5 py-2">
             {bottomNavItems.map((item) => {
               const active = isActive(item.href);
@@ -335,7 +284,7 @@ export function Navbar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="relative flex flex-1 flex-col items-center justify-center gap-1 py-1.5"
+                  className="relative flex flex-1 flex-col items-center justify-center gap-0.5 py-1"
                 >
                   <motion.div
                     className={cn(
@@ -366,7 +315,7 @@ export function Navbar() {
 
                   <span
                     className={cn(
-                      "text-[11px] font-medium transition-colors",
+                      "text-[10px] font-medium transition-colors",
                       active ? "text-gold" : "text-ink/55"
                     )}
                   >
@@ -376,10 +325,10 @@ export function Navbar() {
               );
             })}
 
-            {/* سبد خرید */}
+   
             <button
               onClick={openCart}
-              className="relative flex flex-1 flex-col items-center justify-center gap-1 py-1.5"
+              className="relative flex flex-1 flex-col items-center justify-center gap-0.5 py-1"
             >
               <motion.div
                 className="relative flex h-10 w-10 items-center justify-center rounded-xl text-ink/60 hover:text-ink"
@@ -387,162 +336,19 @@ export function Navbar() {
               >
                 <ShoppingBag className="h-5 w-5" strokeWidth={1.9} />
                 {totalCount > 0 && (
-                  <span className="absolute -top-0.5 -end-0.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-bold text-[#181209]">
+                  <span className="absolute -top-0.5 -end-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-bold text-[#181209]">
                     {totalCount > 9 ? "۹+" : totalCount.toLocaleString("fa-IR")}
                   </span>
                 )}
               </motion.div>
-              <span className="text-[11px] font-medium text-ink/55">سبد</span>
+              <span className="text-[10px] font-medium text-ink/55">سبد</span>
             </button>
           </div>
         </div>
       </nav>
 
-      <AnimatePresence>
-        {open && (
-          <>
-            <motion.div
-              variants={backdropVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-0 z-[200] bg-black/50 backdrop-blur-[5px] lg:hidden"
-              onClick={() => setOpen(false)}
-            />
 
-            <motion.aside
-              variants={panelVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="fixed inset-x-0 bottom-0 z-[210] max-h-[85vh] flex flex-col rounded-t-[28px] bg-bg/98 border-t border-line/80 shadow-[0_-12px_40px_rgba(0,0,0,0.18)] lg:hidden overflow-hidden"
-            >
-              {/* Handle */}
-              <div className="flex justify-center pt-3 pb-1">
-                <div className="h-1.5 w-12 rounded-full bg-ink/15" />
-              </div>
-
-              {/* Header */}
-              <div className="flex items-center justify-between px-5 py-3 border-b border-line/60">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gold/10">
-                    <LogoMark className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <div className="font-display text-[1.05rem] font-extrabold leading-none">
-                      استاد موزیک
-                    </div>
-                    <div className="mt-1 text-[11px] text-muted">منوی بیشتر</div>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => setOpen(false)}
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-ink/5 text-ink/70 transition-all hover:bg-ink/10 hover:text-ink active:scale-95"
-                  aria-label="بستن منو"
-                >
-                  <X className="h-4.5 w-4.5" />
-                </button>
-              </div>
-
-              {/* لیست لینک‌ها */}
-              <motion.nav
-                variants={listVariants}
-                initial="hidden"
-                animate="visible"
-                className="flex-1 overflow-y-auto px-3 py-4"
-              >
-                <ul className="space-y-1">
-                  {links.map((l) => {
-                    const Icon = l.icon;
-                    return (
-                      <motion.li key={l.href} variants={itemVariants}>
-                        <Link
-                          href={l.href}
-                          onClick={() => setOpen(false)}
-                          className="group flex items-center gap-3.5 rounded-2xl px-4 py-3.5 text-[0.95rem] font-medium text-ink/80 transition-all duration-200 hover:bg-gold/10 hover:text-ink"
-                        >
-                          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-ink/5 text-ink/70 group-hover:bg-gold/15 group-hover:text-gold transition-colors">
-                            <Icon className="h-4.5 w-4.5" />
-                          </div>
-                          <span className="flex-1">{l.label}</span>
-                          <span className="h-1.5 w-1.5 rounded-full bg-gold/0 transition-all duration-300 group-hover:bg-gold group-hover:scale-125" />
-                        </Link>
-                      </motion.li>
-                    );
-                  })}
-                </ul>
-              </motion.nav>
-
-              {/* فوتر */}
-              <div className="shrink-0 space-y-3 border-t border-line/70 bg-ink/[0.015] p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-                {!user ? (
-                  <div className="grid grid-cols-2 gap-2.5">
-                    <Button
-                      asChild
-                      variant="outline"
-                      className="w-full rounded-2xl py-5"
-                    >
-                      <Link href="/login" onClick={() => setOpen(false)}>
-                        ورود
-                      </Link>
-                    </Button>
-                    <Button asChild className="w-full rounded-2xl py-5">
-                      <Link href="/signup" onClick={() => setOpen(false)}>
-                        ثبت‌نام
-                      </Link>
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    <div className="rounded-2xl border border-line/80 bg-bg px-4 py-3.5">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gold/15 text-gold">
-                          <User className="h-5 w-5" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="truncate text-sm font-bold">
-                            {user.firstName} {user.lastName}
-                          </div>
-                          <div
-                            className={`mt-1 inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-medium ${roleBadgeClasses}`}
-                          >
-                            {roleLabel}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <Button asChild className="w-full rounded-2xl py-5">
-                      <Link
-                        href={dashboardPath}
-                        onClick={() => setOpen(false)}
-                      >
-                        <LayoutDashboard className="h-4.5 w-4.5 me-2" />
-                        {isAdmin ? "پنل مدیریت" : "پنل کاربری"}
-                      </Link>
-                    </Button>
-
-                    <Button
-                      variant="outline"
-                      className="w-full rounded-2xl py-5 text-red-400 border-red-500/25 hover:bg-red-500/10 hover:text-red-300"
-                      onClick={() => {
-                        logout();
-                        setOpen(false);
-                        router.push("/");
-                      }}
-                    >
-                      <LogOut className="h-4.5 w-4.5 me-2" />
-                      خروج از حساب
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
-      <div className="h-24 lg:hidden" />
+      <div className="h-20 lg:hidden" />
     </>
   );
 }

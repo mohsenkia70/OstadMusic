@@ -1,5 +1,9 @@
 import { apiRequest } from "./client";
-import type { TeacherDetail, TeachersListResponse } from "./types";
+import type {
+  TeacherDetail,
+  TeachersListResponse,
+  TeacherLocationPayload,
+} from "./types";
 
 export type GetTeachersParams = {
   search?: string;
@@ -10,9 +14,13 @@ export type GetTeachersParams = {
   maxPrice?: number;
   minExperienceYears?: number;
   onlyVerified?: boolean;
-  sortBy?: number;
+  sortBy?: number | "NearestFirst" | string;
   page?: number;
   pageSize?: number;
+  // موقعیت
+  latitude?: number;
+  longitude?: number;
+  radiusKm?: number;
 };
 
 export function getTeachers(params: GetTeachersParams = {}) {
@@ -37,6 +45,11 @@ export function getTeachers(params: GetTeachersParams = {}) {
     );
   }
 
+
+  if (params.latitude != null) query.set("latitude", String(params.latitude));
+  if (params.longitude != null) query.set("longitude", String(params.longitude));
+  if (params.radiusKm != null) query.set("radiusKm", String(params.radiusKm));
+
   const qs = query.toString();
   return apiRequest<TeachersListResponse>(
     `/teachers${qs ? `?${qs}` : ""}`,
@@ -48,3 +61,11 @@ export function getTeacherById(id: string) {
   return apiRequest<TeacherDetail>(`/teachers/${id}`, { auth: false });
 }
 
+
+export function updateMyTeacherLocation(payload: TeacherLocationPayload) {
+  return apiRequest<void>(`/teachers/me/location`, {
+    method: "PUT",
+    body: payload,
+    auth: true,
+  });
+}

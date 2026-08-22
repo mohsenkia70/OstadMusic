@@ -208,7 +208,7 @@ export default async function TeacherProfilePage({
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gold-soft">
                   <MessageCircle className="h-4 w-4 text-gold" />
                 </div>
-                <h2 className="text-xl font-bold">نظرات هنرجوان</h2>
+                <h2 className="text-xl font-bold">نظرات هنرجویان</h2>
               </div>
 
               <div className="rounded-2xl border border-dashed border-line bg-surface/40 py-16 text-center">

@@ -99,14 +99,12 @@ export default function AdminTeachersPage() {
       setSelected(full);
     } catch (err) {
       console.error(err);
-      // همون اطلاعات اولیه رو نشون میده
     } finally {
       setDetailLoading(false);
     }
   };
 
   const handleApprove = async (teacher: AdminTeacher) => {
-    // ✅ از sonner confirm استفاده میکنیم
     toast(`آیا از تأیید «${teacher.fullName}» مطمئن هستید؟`, {
       action: {
         label: "بله، تأیید کن",
@@ -193,7 +191,7 @@ export default function AdminTeachersPage() {
         desc="تأیید یا رد اساتید تازه‌ثبت‌نام‌شده"
       />
 
-      {/* Filters */}
+   
       <div className="flex flex-wrap items-center gap-3 mb-6">
         {(
           ["All", "PendingReview", "Approved", "Rejected"] as StatusFilter[]
@@ -465,7 +463,7 @@ export default function AdminTeachersPage() {
         </div>
       )}
 
-      {/* Reject Modal */}
+
       {rejectTarget && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4">
           <div className="bg-surface border border-line rounded-2xl max-w-md w-full p-6 space-y-4">

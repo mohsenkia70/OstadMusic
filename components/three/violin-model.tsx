@@ -68,7 +68,7 @@ export function ViolinModel() {
     <group ref={group} scale={0.85 * scale} rotation={[0.15, -0.35, 0.08]}>
       <pointLight ref={bodyLight} position={[4, 5, 6]} intensity={3.2} color="#0d9488" distance={30} />
 
-      {/* Body */}
+
       <mesh geometry={bodyGeo} position={[0, -0.3, 0]}>
         <meshPhysicalMaterial
           color="#0d9488"
@@ -81,31 +81,31 @@ export function ViolinModel() {
         />
       </mesh>
 
-      {/* Neck */}
+  
       <mesh position={[0, 2.5, 0.05]}>
         <boxGeometry args={[0.28, 2.3, 0.22]} />
         <meshPhysicalMaterial color="#241914" metalness={0.1} roughness={0.55} />
       </mesh>
 
-      {/* Fingerboard */}
+    
       <mesh position={[0, 2.5, 0.2]}>
         <boxGeometry args={[0.34, 2.0, 0.06]} />
         <meshPhysicalMaterial color="#100b08" metalness={0.2} roughness={0.4} />
       </mesh>
 
-      {/* Scroll */}
+ 
       <mesh position={[0, 3.75, 0.05]} rotation={[0, 0, Math.PI / 2.4]}>
         <torusGeometry args={[0.26, 0.09, 12, 24, Math.PI * 1.5]} />
         <meshPhysicalMaterial color="#241914" metalness={0.1} roughness={0.55} />
       </mesh>
 
-      {/* Tailpiece */}
+   
       <mesh position={[0, -1.85, 0.28]}>
         <boxGeometry args={[0.22, 0.65, 0.1]} />
         <meshPhysicalMaterial color="#100b08" metalness={0.2} roughness={0.4} />
       </mesh>
 
-      {/* Strings */}
+
       {stringXs.map((x) => (
         <mesh key={x} position={[x, 0.7, 0.28]}>
           <cylinderGeometry args={[0.006, 0.006, 6.1, 6]} />
@@ -113,7 +113,6 @@ export function ViolinModel() {
         </mesh>
       ))}
 
-      {/* f-holes */}
       {[-1, 1].map((side) => (
         <mesh key={side} position={[side * 0.75, -0.4, 0.31]} rotation={[0, 0, side * 0.28]}>
           <boxGeometry args={[0.08, 1.1, 0.05]} />

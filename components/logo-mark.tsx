@@ -10,7 +10,7 @@ export function LogoMark({ className }: { className?: string }) {
       className={cn("shrink-0", className)}
       aria-hidden="true"
     >
-      {/* Outer refined ring */}
+   
       <circle
         cx="40"
         cy="40"
@@ -28,7 +28,7 @@ export function LogoMark({ className }: { className?: string }) {
         opacity="0.4"
       />
 
-      {/* Abstract Violin body (left curve) */}
+
       <path
         d="M26 55c1-8 5-13 10-15.5 2.5-1.2 5-3.5 5-7 0-3.5-2.5-5.8-5-7C31 23 27 18 26 10"
         stroke="url(#goldMain)"
@@ -37,7 +37,7 @@ export function LogoMark({ className }: { className?: string }) {
         fill="none"
       />
 
-      {/* Abstract Guitar body (right curve) */}
+
       <path
         d="M54 55c-1-8-5-13-10-15.5-2.5-1.2-5-3.5-5-7 0-3.5 2.5-5.8 5-7 5-2.5 9-7.5 10-15.5"
         stroke="url(#goldMain)"
@@ -46,7 +46,7 @@ export function LogoMark({ className }: { className?: string }) {
         fill="none"
       />
 
-      {/* Piano keys suggestion (horizontal bars) */}
+
       <path
         d="M33 38h14"
         stroke="url(#tealMain)"
@@ -69,7 +69,7 @@ export function LogoMark({ className }: { className?: string }) {
         opacity="0.55"
       />
 
-      {/* Central bridge / string */}
+
       <path
         d="M40 18v38"
         stroke="url(#tealMain)"
@@ -78,7 +78,6 @@ export function LogoMark({ className }: { className?: string }) {
       />
       <circle cx="40" cy="56" r="4.8" fill="url(#goldMain)" />
 
-      {/* Soft sound wave accents */}
       <path
         d="M15 40c3-6 6-9 9-9"
         stroke="#14b8a6"

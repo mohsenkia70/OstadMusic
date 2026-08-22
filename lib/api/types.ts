@@ -76,6 +76,16 @@ export type TeacherListItem = {
   isVerified: boolean;
   bioShort: string;
   categories: string[];
+  // فیلدهای جدید برای پروفایل کامل
+  profileImage?: string | null;      // آدرس عکس پروفایل
+  resume?: string | null;           // متن رزومه کامل
+  teachingStyle?: string | null;    // سبک تدریس
+  education?: string | null;        // تحصیلات
+  achievements?: string | null;     // دستاوردها
+  // فیلدهای موقعیت
+  latitude?: number | null;
+  longitude?: number | null;
+  distanceKm?: number | null;
 };
 
 export type TeacherDetail = TeacherListItem & {
@@ -90,6 +100,19 @@ export type TeachersListResponse = {
   pageSize: number;
   totalCount: number;
   totalPages: number;
+};
+
+// ─── Location ────────────────────────────────────────────────────────────────
+
+export type TeacherLocationPayload = {
+  latitude: number;
+  longitude: number;
+};
+
+export type TeacherLocation = {
+  latitude: number;
+  longitude: number;
+  address?: string | null;
 };
 
 // ─── Booking ─────────────────────────────────────────────────────────────────

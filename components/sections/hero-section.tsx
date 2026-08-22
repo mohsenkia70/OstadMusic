@@ -43,7 +43,7 @@ export function HeroSection() {
             <Link href="/teachers">پیدا کردن استاد</Link>
           </Button>
           <Button asChild variant="glass" size="lg">
-            <Link href="#how">چطور کار می‌کند</Link>
+            <Link href="#how">مسیر یادگیری !!</Link>
           </Button>
         </div>
 

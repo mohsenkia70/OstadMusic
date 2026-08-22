@@ -12,7 +12,6 @@ const items: NavItem[] = [
   { href: "/dashboard/admin/teachers", label: "مدیریت اساتید", icon: Users },
 ];
 
-// ✅ تابع کمکی برای normalize کردن role
 function normalizeRole(role: string | undefined | null): string {
   return (role ?? "").toLowerCase();
 }
@@ -29,10 +28,10 @@ export default function AdminDashboardLayout({
   const logout = useAuthStore((s) => s.logout);
 
   useEffect(() => {
-    // ✅ صبر کن hydration تموم بشه
+
     if (!hasHydrated) return;
 
-    // ✅ اگه لاگین نکرده یا توکن expire شده
+
     if (!user || isTokenExpired()) {
       logout();
       router.replace("/login");
@@ -52,7 +51,6 @@ export default function AdminDashboardLayout({
     }
   }, [user, hasHydrated, isTokenExpired, logout, router]);
 
-  // ✅ نمایش loading تا hydration تموم بشه
   if (!hasHydrated) {
     return (
       <div className="flex items-center justify-center min-h-screen text-muted text-sm">
@@ -61,7 +59,6 @@ export default function AdminDashboardLayout({
     );
   }
 
-  // ✅ اگه user نداره یا ادمین نیست، چیزی نشون نده
   if (!user || normalizeRole(user.role) !== "admin") {
     return null;
   }

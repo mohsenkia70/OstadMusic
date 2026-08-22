@@ -3,21 +3,11 @@ import type { AssistantModeId, ChatRole } from "./types";
 
 export type ProviderMessage = { role: ChatRole; content: string };
 
-/**
- * True when no real AI provider key is configured. The API route surfaces
- * this to the client (via a response header) so the UI can show a small
- * "demo mode" badge instead of silently pretending to be a real model.
- */
 export function isDemoMode() {
   return !process.env.OPENAI_API_KEY;
 }
 
-/**
- * Streams the assistant's reply as plain text chunks, regardless of which
- * branch below produced them. This is the one place that knows about
- * OpenAI's specific wire format — swapping providers later (Anthropic,
- * a self-hosted model, etc.) only means changing callRealProvider().
- */
+
 export async function* streamAssistantReply(
   messages: ProviderMessage[],
   modeId: AssistantModeId

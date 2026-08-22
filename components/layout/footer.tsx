@@ -109,11 +109,13 @@ export function Footer() {
             © ۱۴۰۴ استاد موزیک. تمامی حقوق محفوظ است.
           </p>
 
-          <p className="flex items-center gap-1.5 text-sm text-muted">
-            ساخته‌شده با
-            <Heart className="h-3.5 w-3.5 fill-gold text-gold" />
-            برای موسیقی ایران
-          </p>
+            <Link
+              href="/"
+              className="mb-5 inline-flex items-center gap-2.5 font-display text-xl font-extrabold tracking-tight text-ink transition-opacity hover:opacity-80"
+            >
+              <LogoMark className="h-8 w-8" />
+              استاد موزیک
+            </Link>
         </div>
       </div>
     </footer>
